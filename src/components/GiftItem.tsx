@@ -1,0 +1,87 @@
+import React from 'react';
+import { Gift as GiftType } from '../types';
+import { openWhatsApp } from '../services/whatsapp';
+import { Gift } from 'lucide-react';
+
+interface GiftItemProps {
+  gift: GiftType;
+  isAdmin: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onReserve: () => void;
+  coupleNames: string;
+}
+
+const GiftItem: React.FC<GiftItemProps> = ({
+  gift,
+  isAdmin,
+  onEdit,
+  onDelete,
+  onReserve,
+  coupleNames,
+}) => {
+  const handleReserve = () => {
+    onReserve();
+    openWhatsApp(gift, coupleNames);
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-3 sm:p-2 hover:shadow transition-shadow">
+      <div className="w-full aspect-square mb-2 overflow-hidden rounded-md bg-gray-50">
+        {gift.image ? (
+          <img
+            src={gift.image}
+            alt={gift.name}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Gift size={24} className="text-gray-300" />
+          </div>
+        )}
+      </div>
+
+      <h3 className="text-xs sm:text-[13px] font-medium text-gray-800 mb-1 line-clamp-2 min-h-[2.5em]">
+        {gift.name}
+      </h3>
+
+      <p className="text-sm font-medium text-gray-900 mb-2">
+        R$ {gift.price?.toFixed(2).replace('.', ',')}
+      </p>
+
+      {gift.status === 'available' && !isAdmin && (
+        <button
+          onClick={handleReserve}
+          className="w-full bg-[#A88B7C] text-white py-1.5 rounded text-xs font-medium hover:bg-[#97796A] transition-colors"
+        >
+          Presentear
+        </button>
+      )}
+
+      {gift.status === 'reserved' && (
+        <span className="block w-full py-1.5 bg-gray-100 text-gray-500 rounded text-center text-xs">
+          Reservado
+        </span>
+      )}
+
+      {isAdmin && (
+        <div className="flex gap-1 mt-2">
+          <button
+            onClick={onEdit}
+            className="flex-1 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs"
+          >
+            Editar
+          </button>
+          <button
+            onClick={onDelete}
+            className="flex-1 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs"
+          >
+            Excluir
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default GiftItem;

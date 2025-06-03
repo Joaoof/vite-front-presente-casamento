@@ -1,0 +1,106 @@
+import { useState } from 'react';
+import { useAuth } from './hooks/useAuth';
+import { useGifts } from './hooks/useGifts';
+import { Gift } from './types';
+
+// Components
+import Header from './components/Header';
+import Footer from './components/Footer';
+import GiftList from './components/GiftList';
+import AdminPanel from './components/AdminPanel';
+import LoginModal from './components/LoginModal';
+
+// Custom styles
+import './styles/animations.css';
+
+function App() {
+  // App configuration
+  const coupleNames = 'João Victor & Ana Luiza';
+  const weddingDate = 'Data do Casamento: 20/01/2024';
+
+  // Authentication
+  const { isAuthenticated, login, logout } = useAuth();
+
+  // Gifts state and handlers
+  const {
+    gifts,
+    addGift,
+    updateGift,
+    removeGift,
+    reserveGift,
+    searchTerm,
+    setSearchTerm,
+    filter,
+    setFilter,
+  } = useGifts([]);
+
+  // UI state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [giftToEdit, setGiftToEdit] = useState<Gift | null>(null);
+
+  // Event handlers
+  const handleEditGift = (gift: Gift) => {
+    setGiftToEdit(gift);
+  };
+
+  const handleCancelEdit = () => {
+    setGiftToEdit(null);
+  };
+
+  const handleSubmitEdit = (updatedGift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
+    if (giftToEdit) {
+      updateGift(giftToEdit.id, updatedGift);
+      setGiftToEdit(null);
+    } else {
+      addGift(updatedGift);
+    }
+  };
+
+  // const handleLogin = (password: string) => {
+  //   return login(password);
+  // };
+
+  return (
+    <div className="bg-custom-header min-h-screen flex flex-col font-lato">
+      <Header
+        coupleNames={coupleNames}
+        weddingDate={weddingDate}
+        isAdmin={!!isAuthenticated}
+        onLoginClick={() => setShowLoginModal(true)}
+        onLogoutClick={logout}
+      />
+
+      <main className="flex-grow container mx-auto px-8 py-4">
+        {isAuthenticated && (
+          <AdminPanel
+            onAddGift={handleSubmitEdit}
+            giftToEdit={giftToEdit}
+            onCancelEdit={handleCancelEdit}
+          />
+        )}
+
+        <GiftList
+          gifts={gifts}
+          isAdmin={isAuthenticated}
+          onEditGift={handleEditGift}
+          onDeleteGift={removeGift}
+          onReserveGift={reserveGift}
+          coupleNames={coupleNames}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filter={filter}
+          onFilterChange={setFilter}
+        />
+      </main>
+
+      <Footer />
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
+    </div>
+  );
+}
+
+export default App;
