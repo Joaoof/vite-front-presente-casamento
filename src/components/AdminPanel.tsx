@@ -29,7 +29,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   return (
     <div className="mb-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5 gap-4">
         <h2 className="text-2xl font-serif text-gray-800">Gerenciar Presentes</h2>
 
         {!shouldShowForm && (
