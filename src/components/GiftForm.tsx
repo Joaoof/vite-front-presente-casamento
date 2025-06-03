@@ -17,7 +17,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
 }) => {
   const [name, setName] = useState(initialData.name || '');
   const [description, setDescription] = useState(initialData.description || '');
-  const [image, setImage] = useState(initialData.image || '');
+  const [imageUrl, setImage] = useState(initialData.imageUrl || '');
   const [price, setPrice] = useState(initialData.price?.toString() || '');
   const [priority, setPriority] = useState(initialData.priority || 'medium');
   const [previewError, setPreviewError] = useState(false);
@@ -28,7 +28,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
     onSubmit({
       name,
       description,
-      image: image || undefined,
+      imageUrl: imageUrl || undefined,
       price: price ? Number(price) : undefined,
       priority: priority as 'high' | 'medium' | 'low',
     });
@@ -139,7 +139,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
                 <input
                   id="image"
                   type="url"
-                  value={image}
+                  value={imageUrl}
                   onChange={(e) => {
                     setImage(e.target.value);
                     setPreviewError(false);
@@ -149,7 +149,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
                 />
               </div>
 
-              {image && (
+              {imageUrl && (
                 <div className="mt-3 relative">
                   <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
                     {previewError ? (
@@ -159,7 +159,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
                       </div>
                     ) : (
                       <img
-                        src={image}
+                        src={imageUrl}
                         alt="Preview"
                         onError={handleImageError}
                         className="w-full h-full object-contain"

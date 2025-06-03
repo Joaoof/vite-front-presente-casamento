@@ -12,6 +12,7 @@ interface GiftItemProps {
   coupleNames: string;
 }
 
+
 const GiftItem: React.FC<GiftItemProps> = ({
   gift,
   isAdmin,
@@ -25,12 +26,15 @@ const GiftItem: React.FC<GiftItemProps> = ({
     openWhatsApp(gift, coupleNames);
   };
 
+  console.log(gift);
+
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-3 sm:p-2 hover:shadow transition-shadow">
-      <div className="w-full aspect-square mb-2 overflow-hidden rounded-md bg-gray-50">
-        {gift.image ? (
+      <div className="w-full aspect-square mb-2 overflow-hidden rounded-md bg-white">
+        {gift.imageUrl ? (
           <img
-            src={gift.image}
+            src={gift.imageUrl}
             alt={gift.name}
             className="w-full h-full object-contain"
           />
