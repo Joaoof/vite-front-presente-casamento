@@ -12,6 +12,8 @@ import LoginModal from './components/LoginModal';
 
 // Custom styles
 import './styles/animations.css';
+import PhotoCarousel from './components/PhotosCarousel';
+import OurStory from './components/OurStory';
 
 function App() {
   // App configuration
@@ -71,6 +73,8 @@ function App() {
       />
 
       <main className="flex-grow container mx-auto px-8 py-4">
+        <PhotoCarousel />
+        <OurStory />
         {isAuthenticated && (
           <AdminPanel
             onAddGift={handleSubmitEdit}

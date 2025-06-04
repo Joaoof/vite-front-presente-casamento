@@ -34,22 +34,18 @@ export const api = {
     }
   },
 
-  async updateGift(id: string, gift: Partial<Gift>): Promise<Gift> {
-    try {
-      const response = await fetch(`${API_URL}/gifts/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(gift),
-      });
-      if (!response.ok) throw new Error('Falha ao atualizar presente');
-      return response.json();
-    } catch (error) {
-      console.error('Erro ao atualizar presente:', error);
-      throw error;
-    }
+
+  async reserveGift(id: string, reservedBy: string): Promise<Gift> {
+    const response = await fetch(`${API_URL}/gifts/${id}/reserve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reservedBy }),
+    });
+
+    if (!response.ok) throw new Error('Erro ao reservar');
+    return response.json();
   },
 
   async deleteGift(id: string): Promise<void> {

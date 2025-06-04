@@ -32,7 +32,7 @@ const GiftList: React.FC<GiftListProps> = ({
     <div className="animate-fade-in max-w-5xl mx-auto px-1">
       <div className="text-center mb-1">
         <img
-          src="https://thumbs.dreamstime.com/b/caixa-de-presente-cart%C3%A3o-azul-vazia-isolada-em-fundo-branco-arquivo-cont%C3%A9m-caminho-recorte-353246849.jpg?w=768"
+          src="https://sdmntpreastus.oaiusercontent.com/files/00000000-52ac-61f9-a42e-c0a5ec01657c/raw?se=2025-06-04T13%3A02%3A23Z&sp=r&sv=2024-08-04&sr=b&scid=2e892d9e-7710-5fa7-bfdf-aa88d5d19a97&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-03T18%3A26%3A18Z&ske=2025-06-04T18%3A26%3A18Z&sks=b&skv=2024-08-04&sig=hosOwPe77Wx5wFgs4elIDUFIoG/OE1BwYqW6UlS56TQ%3D"
           alt="Decorative branch"
           className="w-44 mx-auto mb-6 opacity-80"
         />

@@ -2,7 +2,8 @@ export interface Gift {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string | 'https://img.cdndsgni.com/preview/10555726.jpg';
+  imageUrl?: string;
+  reservedBy?: string;
   price?: number;
   status: 'available' | 'reserved';
   priority?: 'high' | 'medium' | 'low';
@@ -11,4 +12,13 @@ export interface Gift {
 
 export interface User {
   isAdmin: boolean;
+}
+
+export interface GiftRegistration {
+  id: string;
+  guestName: string;
+  guestEmail: string;
+  giftId: string;
+  createdAt: number;
+  status: 'pending' | 'confirmed' | 'cancelled';
 }

@@ -39,7 +39,8 @@ export const useGifts = (p0: (prev: any[]) => any[]) => {
   const updateGift = async (id: string, updates: Partial<Gift>): Promise<void> => {
     try {
       setError(null);
-      const updatedGift = await api.updateGift(id, updates);
+      // You need to provide a reservedBy value here, e.g., 'system' or get it from parameters
+      const updatedGift = await api.reserveGift(id, updates.reservedBy ?? 'system');
       setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
     } catch (err) {
       setError('Falha ao atualizar o presente. Tente novamente.');
