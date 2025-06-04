@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Gift } from '../types';
 import { api } from '../services/api';
 
-export const useGifts = (p0: (prev: any[]) => any[]) => {
+export const useGifts = () => {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,11 +36,13 @@ export const useGifts = (p0: (prev: any[]) => any[]) => {
     }
   };
 
-  const updateGift = async (id: string, updates: Partial<Gift>): Promise<void> => {
+  const updateGift = async (id: string, reservedBy: string): Promise<void> => {
     try {
       setError(null);
       // You need to provide a reservedBy value here, e.g., 'system' or get it from parameters
-      const updatedGift = await api.reserveGift(id, updates.reservedBy ?? 'system');
+      const updatedGift = await api.reserveGift(id, reservedBy);
+      console.log(updatedGift);
+
       setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
     } catch (err) {
       setError('Falha ao atualizar o presente. Tente novamente.');
@@ -59,8 +61,11 @@ export const useGifts = (p0: (prev: any[]) => any[]) => {
     }
   };
 
-  const reserveGift = async (id: string): Promise<void> => {
-    await updateGift(id, { status: 'reserved' });
+  const reserveGift = async (id: string, reservedBy: string) => {
+    const updatedGift = await api.reserveGift(id, reservedBy);
+    setGifts((prev) =>
+      prev.map((g) => (g.id === id ? updatedGift : g))
+    );
   };
 
   const filteredGifts = gifts

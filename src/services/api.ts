@@ -26,6 +26,9 @@ export const api = {
         },
         body: JSON.stringify(gift),
       });
+
+      console.log(response);
+
       if (!response.ok) throw new Error('Falha ao criar presente');
       return response.json();
     } catch (error) {
@@ -44,7 +47,8 @@ export const api = {
       body: JSON.stringify({ reservedBy }),
     });
 
-    if (!response.ok) throw new Error('Erro ao reservar');
+    if (!response.ok) throw new Error('Erro ao reservar presente');
+
     return response.json();
   },
 

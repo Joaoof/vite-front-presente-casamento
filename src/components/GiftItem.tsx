@@ -29,24 +29,16 @@ const GiftItem: React.FC<GiftItemProps> = ({
     setShowModal(true);
   };
 
-  const handleReserveConfirm = async () => {
-    // if (!guestName || !guestEmail) {
-    //   alert('Por favor, preencha nome e e-mail.');
-    //   return;
-    // }
-
-    const reservedBy = `${guestName} <${guestEmail}>`;
-    console.log(reservedBy);
-
-
+  const handleReserveConfirm = async (reservedBy: string) => {
     try {
-      await onReserve(reservedBy); // Chama a função que vai pro service
+      onReserve(reservedBy);
+      console.log('ESSA È A FUNÇÂO DE RESERVAR', reservedBy);
+
+      // Chama a função que vai pro service
       setShowModal(false);
-      setGuestName('');
-      setGuestEmail('');
     } catch (error) {
-      console.error('Erro ao reservar:', error);
-      alert('Erro ao reservar o presente');
+      console.error('Erro ao reservar presente:', error);
+      alert('Erro ao reservar. Tente novamente.');
     }
   };
 
@@ -90,37 +82,31 @@ const GiftItem: React.FC<GiftItemProps> = ({
       {/* Modal de Reserva */}
       <ReservationModal
         isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setGuestName('');
-          setGuestEmail('');
-        }}
+        onClose={() => setShowModal(false)}
         onConfirm={handleReserveConfirm}
         giftName={gift.name}
-        guestName={guestName}
-        guestEmail={guestEmail}
-        setGuestName={setGuestName}
-        setGuestEmail={setGuestEmail}
       />
 
       {/* Botões Admin */}
-      {isAdmin && (
-        <div className="flex gap-1 mt-2">
-          <button
-            onClick={onEdit}
-            className="flex-1 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs"
-          >
-            Editar
-          </button>
-          <button
-            onClick={onDelete}
-            className="flex-1 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs"
-          >
-            Excluir
-          </button>
-        </div>
-      )}
-    </div>
+      {
+        isAdmin && (
+          <div className="flex gap-1 mt-2">
+            <button
+              onClick={onEdit}
+              className="flex-1 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs"
+            >
+              Editar
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex-1 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs"
+            >
+              Excluir
+            </button>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

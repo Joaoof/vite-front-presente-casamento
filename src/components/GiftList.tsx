@@ -8,7 +8,7 @@ interface GiftListProps {
   isAdmin: boolean;
   onEditGift: (gift: GiftType) => void;
   onDeleteGift: (id: string) => void;
-  onReserveGift: (id: string) => void;
+  onReserveGift: (id: string, reservedBy: string) => void;
   coupleNames: string;
   searchTerm: string;
   onSearchChange: (term: string) => void;
@@ -28,11 +28,13 @@ const GiftList: React.FC<GiftListProps> = ({
   filter,
   onFilterChange,
 }) => {
+  const [name, setName] = useState('');
+
   return (
     <div className="animate-fade-in max-w-5xl mx-auto px-1">
       <div className="text-center mb-1">
         <img
-          src="https://sdmntpreastus.oaiusercontent.com/files/00000000-52ac-61f9-a42e-c0a5ec01657c/raw?se=2025-06-04T13%3A02%3A23Z&sp=r&sv=2024-08-04&sr=b&scid=2e892d9e-7710-5fa7-bfdf-aa88d5d19a97&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-03T18%3A26%3A18Z&ske=2025-06-04T18%3A26%3A18Z&sks=b&skv=2024-08-04&sig=hosOwPe77Wx5wFgs4elIDUFIoG/OE1BwYqW6UlS56TQ%3D"
+          src="https://sdmntpreastus.oaiusercontent.com/files/00000000-52ac-61f9-a42e-c0a5ec01657c/raw?se=2025-06-04T17%3A51%3A51Z&sp=r&sv=2024-08-04&sr=b&scid=bcf45bce-c3a9-57e2-a619-898cf02ee9aa&skoid=02b7f7b5-29f8-416a-aeb6-99464748559d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-03T18%3A27%3A34Z&ske=2025-06-04T18%3A27%3A34Z&sks=b&skv=2024-08-04&sig=XxNfpM24l/ITVn5LDWF9ZcjzkBJ8hRND%2BHWqoIfpmUo%3D"
           alt="Decorative branch"
           className="w-44 mx-auto mb-6 opacity-80"
         />
@@ -73,7 +75,7 @@ const GiftList: React.FC<GiftListProps> = ({
               isAdmin={isAdmin}
               onEdit={() => onEditGift(gift)}
               onDelete={() => onDeleteGift(gift.id)}
-              onReserve={() => onReserveGift(gift.id)}
+              onReserve={() => onReserveGift(gift.id, gift.reservedBy ?? '')}
               coupleNames={coupleNames}
             />
           ))}

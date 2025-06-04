@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Gift as GiftType } from '../types';
 import GiftForm from './GiftForm';
 import { PlusCircle } from 'lucide-react';
+import ReservationModal from './ReservationModal';
 import { useAuth } from '../hooks/useAuth';
 
 interface AdminPanelProps {
@@ -14,7 +15,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  gifts,
+  gifts = [], // ✅ Inicializa com array vazio
   onAddGift,
   onUpdateGift,
   onDeleteGift,
@@ -22,6 +23,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   onCancelEdit,
 }) => {
   const [showForm, setShowForm] = useState(false);
+  const [showExportMessage, setShowExportMessage] = useState(false);
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) return null;
@@ -31,14 +33,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setShowForm(false);
   };
 
+  const handleReserveClick = (gift: GiftType) => {
+    // Aqui você pode abrir um modal ou chamar uma função que faz isso
+    console.log('Reservar presente:', gift);
+  };
+
   const handleExport = () => {
+    if (!gifts || gifts.length === 0) {
+      alert('Nenhum presente encontrado para exportar');
+      return;
+    }
+
     const csvContent =
-      'Nome Presente,Preço,Status,Reservado Por\n' +
+      'Nome Presente,Preço,Status,Reservado por\n' +
       gifts
         .filter((g) => g.status === 'reserved')
         .map(
           (g) =>
-            `${g.name},${g.price !== undefined ? g.price.toFixed(2).replace('.', ',') : ''},${g.status},${g.reservedBy || ''}`,
+            `${g.name},${g.price?.toFixed(2).replace('.', ',')},${g.status},${g.reservedBy || ''}`,
         )
         .join('\n');
 
@@ -50,14 +62,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    setShowExportMessage(true);
+    setTimeout(() => setShowExportMessage(false), 3000);
   };
+
+  const shouldShowForm = showForm || giftToEdit !== null;
 
   return (
     <div className="mb-10 animate-fade-in">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h2 className="text-2xl font-serif text-gray-800">Gerenciar Presentes</h2>
 
-        {!showForm && (
+        {!shouldShowForm && (
           <button
             onClick={() => setShowForm(true)}
             className="self-start md:self-auto flex items-center px-4 py-3 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors shadow-sm"
@@ -68,8 +85,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         )}
       </div>
 
+      {/* Formulário condicional */}
+      {shouldShowForm && (
+        <GiftForm
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            onCancelEdit();
+          }}
+          initialData={giftToEdit || {}}
+          isEdit={giftToEdit !== null}
+        />
+      )}
+
       {/* Tabela de Presentes */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -83,7 +113,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Reservado por
+                Reservado por 
               </th>
               <th className="relative px-6 py-3 text-right">
                 <button
@@ -96,50 +126,60 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {gifts.map((gift) => (
-              <tr key={gift.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{gift.name}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-700">
-                    R$ {gift.price !== undefined ? gift.price.toFixed(2).replace('.', ',') : '-'}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${gift.status === 'available'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                  >
-                    {gift.status === 'available' ? 'Disponível' : 'Reservado'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{gift.reservedBy || '-'}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => onUpdateGift(gift.id, gift)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDeleteGift(gift.id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    Excluir
-                  </button>
+            {gifts.length > 0 ? (
+              gifts.map((gift) => (
+                <tr key={gift.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{gift.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-700">
+                      R$ {gift.price?.toFixed(2).replace('.', ',') || '-'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs leading-5 font-semibold rounded-full ${gift.status === 'available'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                    >
+                      {gift.status === 'available' ? 'Disponível' : 'Reservado'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{gift.reservedBy || '-'}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => onUpdateGift(gift.id, gift)}
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDeleteGift(gift.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="py-10 text-center text-gray-500">
+                  Nenhum presente adicionado ainda.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Formulário condicional */}
+      {showExportMessage && (
+        <p className="mt-2 text-green-600 text-sm">Lista exportada com sucesso!</p>
+      )}
     </div>
   );
 };

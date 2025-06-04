@@ -14,6 +14,7 @@ import LoginModal from './components/LoginModal';
 import './styles/animations.css';
 import PhotoCarousel from './components/PhotosCarousel';
 import OurStory from './components/OurStory';
+import { api } from './services/api';
 
 function App() {
   // App configuration
@@ -29,12 +30,11 @@ function App() {
     addGift,
     updateGift,
     removeGift,
-    reserveGift,
     searchTerm,
     setSearchTerm,
     filter,
-    setFilter,
-  } = useGifts([]);
+    setFilter, reserveGift
+  } = useGifts();
 
   // UI state
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -51,10 +51,30 @@ function App() {
 
   const handleSubmitEdit = (updatedGift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
     if (giftToEdit) {
-      updateGift(giftToEdit.id, updatedGift);
+      if (updatedGift.reservedBy) {
+        if (updateGift) {
+          updateGift(giftToEdit.id, updatedGift.reservedBy);
+        } else {
+          console.error('updateGift is undefined');
+        }
+      } else {
+        console.error('reservedBy is undefined');
+      }
       setGiftToEdit(null);
     } else {
-      addGift(updatedGift);
+      if (addGift) {
+        addGift(updatedGift);
+      } else {
+        console.error('addGift is undefined');
+      }
+    }
+  };
+
+  const handleReserve = async (id: string, reservedBy: string) => {
+    try {
+      await reserveGift(id, reservedBy);
+    } catch (error) {
+      console.error('Erro ao reservar:', error);
     }
   };
 
@@ -79,8 +99,11 @@ function App() {
           <AdminPanel
             onAddGift={handleSubmitEdit}
             giftToEdit={giftToEdit}
-            onCancelEdit={handleCancelEdit}
-          />
+            onCancelEdit={handleCancelEdit} gifts={[]} onUpdateGift={function (id: string, gift: Partial<Gift>): void {
+              throw new Error('Function not implemented.');
+            }} onDeleteGift={function (id: string): void {
+              throw new Error('Function not implemented.');
+            }} />
         )}
 
         <GiftList
@@ -88,11 +111,11 @@ function App() {
           isAdmin={isAuthenticated}
           onEditGift={handleEditGift}
           onDeleteGift={removeGift}
-          onReserveGift={reserveGift}
+          onReserveGift={(id: string, reservedBy: string) => { return handleReserve(id, reservedBy); }}
           coupleNames={coupleNames}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          filter={filter}
+          searchTerm={searchTerm ?? ''}
+          onSearchChange={setSearchTerm ?? (() => { })}
+          filter={filter ?? "all"}
           onFilterChange={setFilter}
         />
       </main>
