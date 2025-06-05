@@ -41,16 +41,22 @@ export const api = {
   },
 
 
-  async reserveGift(id: string, reservedBy: string): Promise<Gift> {
-    const response = await fetch(`${API_URL}/gifts/${id}/reserve`, {
+  async reserveGift(giftId: string, guestName: string): Promise<Gift> {
+    const response = await fetch(`${API_URL}/gifts/${giftId}/reserve`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ reservedBy }),
+      body: JSON.stringify({ reservedBy: guestName }),
     });
 
-    if (!response.ok) throw new Error('Erro ao reservar presente');
+    console.log('ESSE AQUI È MEU RESPONSE SEU BOBÂO', response);
+
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reserve gift');
+    }
 
     return response.json();
   },

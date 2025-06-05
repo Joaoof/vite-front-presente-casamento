@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Gift as GiftType } from '../types';
+import { Gift, Gift as GiftType } from '../types';
 import GiftItem from './GiftItem';
 import { ShoppingCart } from 'lucide-react';
+import ReservationModal from './ReservationModal';
 
 interface GiftListProps {
   gifts: GiftType[];
@@ -23,18 +24,36 @@ const GiftList: React.FC<GiftListProps> = ({
   onDeleteGift,
   onReserveGift,
   coupleNames,
-  searchTerm,
-  onSearchChange,
   filter,
   onFilterChange,
 }) => {
-  const [name, setName] = useState('');
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
+
+  const handleOpenModal = (gift: Gift) => {
+    setSelectedGift(gift);
+    setModalOpen(true);
+  };
+
+  const handleConfirmReservation = async (reservedBy: string) => {
+    if (selectedGift) {
+      try {
+        await onReserveGift(selectedGift.id, reservedBy);
+        alert('Presente reservado com sucesso!');
+      } catch (err) {
+        alert('Erro ao reservar presente');
+      } finally {
+        setModalOpen(false);
+        setSelectedGift(null);
+      }
+    }
+  };
 
   return (
     <div className="animate-fade-in max-w-5xl mx-auto px-1">
       <div className="text-center mb-1">
         <img
-          src="https://sdmntpreastus.oaiusercontent.com/files/00000000-52ac-61f9-a42e-c0a5ec01657c/raw?se=2025-06-04T17%3A51%3A51Z&sp=r&sv=2024-08-04&sr=b&scid=bcf45bce-c3a9-57e2-a619-898cf02ee9aa&skoid=02b7f7b5-29f8-416a-aeb6-99464748559d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-03T18%3A27%3A34Z&ske=2025-06-04T18%3A27%3A34Z&sks=b&skv=2024-08-04&sig=XxNfpM24l/ITVn5LDWF9ZcjzkBJ8hRND%2BHWqoIfpmUo%3D"
+          src="https://i.postimg.cc/s24p309j/Noivos-em-Silhueta-e-Flores.png"
           alt="Decorative branch"
           className="w-44 mx-auto mb-6 opacity-80"
         />
@@ -64,7 +83,11 @@ const GiftList: React.FC<GiftListProps> = ({
       {gifts.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500 text-sm">Nenhum presente encontrado.</p>
-          {isAdmin && <p className="text-gray-500 text-sm mt-2">Adicione presentes à lista clicando no botão acima.</p>}
+          {isAdmin && (
+            <p className="text-gray-500 text-sm mt-2">
+              Adicione presentes à lista clicando no botão acima.
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -75,11 +98,24 @@ const GiftList: React.FC<GiftListProps> = ({
               isAdmin={isAdmin}
               onEdit={() => onEditGift(gift)}
               onDelete={() => onDeleteGift(gift.id)}
-              onReserve={() => onReserveGift(gift.id, gift.reservedBy ?? '')}
+              onReserve={() => handleOpenModal(gift)} // ✅ Abre o modal certo
               coupleNames={coupleNames}
             />
           ))}
         </div>
+      )}
+
+      {/* ⬇️ Fora da grid! Isso aqui é fundamental */}
+      {selectedGift && (
+        <ReservationModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedGift(null);
+          }}
+          onConfirm={handleConfirmReservation}
+          giftName={selectedGift.name}
+        />
       )}
     </div>
   );

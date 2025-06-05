@@ -7,15 +7,13 @@ export const useGifts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'available' | 'reserved'>('all');
-  const [error, setError] = useState<string | null>(null);
 
   const fetchGifts = async () => {
     try {
-      setError(null);
       const data = await api.getGifts();
       setGifts(data);
-    } catch (err) {
-      setError('Falha ao carregar os presentes. Tente novamente mais tarde.');
+    } catch (error) {
+      console.error('Error fetching gifts:', error);
     } finally {
       setIsLoading(false);
     }
@@ -25,47 +23,75 @@ export const useGifts = () => {
     fetchGifts();
   }, []);
 
-  const addGift = async (gift: Omit<Gift, 'id' | 'createdAt' | 'status'>): Promise<void> => {
+  const addGift = async (gift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
     try {
-      setError(null);
-      const newGift = await api.createGift(gift);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify(gift),
+      });
+
+      if (!response.ok) throw new Error('Failed to add gift');
+
+      const newGift = await response.json();
       setGifts(prev => [...prev, newGift]);
-    } catch (err) {
-      setError('Falha ao adicionar o presente. Tente novamente.');
-      throw err;
+    } catch (error) {
+      console.error('Error adding gift:', error);
+      throw error;
     }
   };
 
-  const updateGift = async (id: string, reservedBy: string): Promise<void> => {
+  const updateGift = async (id: string, updates: Partial<Gift>) => {
     try {
-      setError(null);
-      // You need to provide a reservedBy value here, e.g., 'system' or get it from parameters
-      const updatedGift = await api.reserveGift(id, reservedBy);
-      console.log(updatedGift);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify(updates),
+      });
 
+      if (!response.ok) throw new Error('Failed to update gift');
+
+      const updatedGift = await response.json();
       setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
-    } catch (err) {
-      setError('Falha ao atualizar o presente. Tente novamente.');
-      throw err;
+    } catch (error) {
+      console.error('Error updating gift:', error);
+      throw error;
     }
   };
 
-  const removeGift = async (id: string): Promise<void> => {
+  const removeGift = async (id: string) => {
     try {
-      setError(null);
-      await api.deleteGift(id);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to delete gift');
+
       setGifts(prev => prev.filter(gift => gift.id !== id));
-    } catch (err) {
-      setError('Falha ao remover o presente. Tente novamente.');
-      throw err;
+    } catch (error) {
+      console.error('Error removing gift:', error);
+      throw error;
     }
   };
 
   const reserveGift = async (id: string, reservedBy: string) => {
-    const updatedGift = await api.reserveGift(id, reservedBy);
-    setGifts((prev) =>
-      prev.map((g) => (g.id === id ? updatedGift : g))
-    );
+    try {
+      const updatedGift = await api.reserveGift(id, reservedBy);
+      setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
+      return updatedGift;
+    } catch (error) {
+      console.error('Error reserving gift:', error);
+      throw error;
+    }
   };
 
   const filteredGifts = gifts
@@ -76,14 +102,13 @@ export const useGifts = () => {
     })
     .filter((gift) =>
       gift.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gift.description.toLowerCase().includes(searchTerm.toLowerCase())
+      gift.description?.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .sort((a, b) => b.createdAt - a.createdAt);
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return {
     gifts: filteredGifts,
     isLoading,
-    error,
     addGift,
     updateGift,
     removeGift,
@@ -92,6 +117,5 @@ export const useGifts = () => {
     setSearchTerm,
     filter,
     setFilter,
-    refetch: fetchGifts,
   };
 };

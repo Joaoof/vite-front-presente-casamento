@@ -22,7 +22,7 @@ function App() {
   const weddingDate = 'Data do Casamento: 20/01/2024';
 
   // Authentication
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   // Gifts state and handlers
   const {
@@ -30,10 +30,11 @@ function App() {
     addGift,
     updateGift,
     removeGift,
+    reserveGift,
     searchTerm,
     setSearchTerm,
     filter,
-    setFilter, reserveGift
+    setFilter,
   } = useGifts();
 
   // UI state
@@ -51,36 +52,21 @@ function App() {
 
   const handleSubmitEdit = (updatedGift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
     if (giftToEdit) {
-      if (updatedGift.reservedBy) {
-        if (updateGift) {
-          updateGift(giftToEdit.id, updatedGift.reservedBy);
-        } else {
-          console.error('updateGift is undefined');
-        }
-      } else {
-        console.error('reservedBy is undefined');
-      }
+      updateGift(giftToEdit.id, updatedGift);
       setGiftToEdit(null);
     } else {
-      if (addGift) {
-        addGift(updatedGift);
-      } else {
-        console.error('addGift is undefined');
-      }
+      addGift(updatedGift);
     }
   };
 
-  const handleReserve = async (id: string, reservedBy: string) => {
+  const handleReserveGift = async (id: string, reservedBy: string) => {
     try {
       await reserveGift(id, reservedBy);
     } catch (error) {
-      console.error('Erro ao reservar:', error);
+      console.error('Erro ao reservar presente:', error);
+      throw error;
     }
   };
-
-  // const handleLogin = (password: string) => {
-  //   return login(password);
-  // };
 
   return (
     <div className="bg-custom-header min-h-screen flex flex-col font-lato">
@@ -97,13 +83,13 @@ function App() {
         <OurStory />
         {isAuthenticated && (
           <AdminPanel
+            gifts={gifts}
             onAddGift={handleSubmitEdit}
+            onUpdateGift={updateGift}
+            onDeleteGift={removeGift}
             giftToEdit={giftToEdit}
-            onCancelEdit={handleCancelEdit} gifts={[]} onUpdateGift={function (id: string, gift: Partial<Gift>): void {
-              throw new Error('Function not implemented.');
-            }} onDeleteGift={function (id: string): void {
-              throw new Error('Function not implemented.');
-            }} />
+            onCancelEdit={handleCancelEdit}
+          />
         )}
 
         <GiftList
@@ -111,11 +97,11 @@ function App() {
           isAdmin={isAuthenticated}
           onEditGift={handleEditGift}
           onDeleteGift={removeGift}
-          onReserveGift={(id: string, reservedBy: string) => { return handleReserve(id, reservedBy); }}
+          onReserveGift={handleReserveGift}
           coupleNames={coupleNames}
-          searchTerm={searchTerm ?? ''}
-          onSearchChange={setSearchTerm ?? (() => { })}
-          filter={filter ?? "all"}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filter={filter}
           onFilterChange={setFilter}
         />
       </main>

@@ -20,22 +20,14 @@ const GiftRegistrationForm: React.FC<GiftRegistrationFormProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const validateEmail = (email: string) => {
-        const re = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-        return re.test(email);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setIsSubmitting(true);
 
         try {
-            if (!validateEmail(guestEmail)) {
-                throw new Error('Por favor, insira um e-mail válido.');
-            }
-
-            await api.reserveGift(gift.id, guestName);
+            const fullName = `${guestName} <${guestEmail}>`;
+            await api.reserveGift(gift.id, fullName);
 
             setSuccess(true);
             setTimeout(() => {
