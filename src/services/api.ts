@@ -7,16 +7,13 @@ console.log(API_URL);
 
 export const api = {
   async getGifts(): Promise<Gift[]> {
-    try {
-      const response = await fetch(`${API_URL}/gifts`);
-      console.log(response);
+    const response = await fetch(`${API_URL}/gifts`, {
+      method: 'GET',
+    });
+    console.log(response);
 
-      if (!response.ok) throw new Error('Falha ao buscar presentes');
-      return response.json();
-    } catch (error) {
-      console.error('Erro ao buscar presentes:', error);
-      throw error;
-    }
+    if (!response.ok) throw new Error('Falha ao buscar presentes');
+    return response.json();
   },
 
   async createGift(gift: Omit<Gift, 'id' | 'createdAt' | 'status'>): Promise<Gift> {

@@ -37,7 +37,6 @@ const GiftList: React.FC<GiftListProps> = ({
   const [hasError, setHasError] = useState(false);
 
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
   const fetchGifts = async (page: number) => {
     setIsLoading(true);
     try {
@@ -60,8 +59,13 @@ const GiftList: React.FC<GiftListProps> = ({
 
       const result = await response.json();
 
+      console.log(result);
+
+
       // ✅ Garantir que sempre será um array
-      const data = Array.isArray(result.data) ? result.data : [];
+      const data = Array.isArray(result) ? result : [];;
+      console.log(data);
+
 
       setGifts(data);
       setTotalItems(result.meta?.total || data.length); // fallback para length do array
