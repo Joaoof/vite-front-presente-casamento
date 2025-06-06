@@ -3,8 +3,6 @@ import { Gift, Gift as GiftType } from '../types';
 import GiftItem from './GiftItem';
 import { ShoppingCart } from 'lucide-react';
 import ReservationModal from './ReservationModal';
-import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 
 interface GiftListProps {
@@ -43,64 +41,32 @@ const GiftList: React.FC<GiftListProps> = ({
       try {
         await onReserveGift(selectedGift.id, reservedBy);
 
-        // 💥 Confete elegante
-        confetti({
-          particleCount: 100,
-          spread: 80,
-          origin: { y: 0.6 },
-          scalar: 1.2,
-          colors: ['#FFB6C1', '#FFD700', '#E6E6FA', '#FFE4E1'],
-          zIndex: 9999,
-        });
+        // Mostrar banner de sucesso no topo
+        const successBanner = document.createElement('div');
+        successBanner.className =
+          'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 ease-in-out animate-fade-in-up';
+        successBanner.style.maxWidth = '90%';
+        successBanner.innerText = `✅ Você reservou "${selectedGift.name}"!`;
 
-        // 🥳 Notificação personalizada
-        toast.success(
-          <div className="text-left">
-            <h3 className="font-semibold text-lg text-gray-800">Presente Reservado!</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              Você reservou <strong>"{selectedGift.name}"</strong> com sucesso.
-            </p>
-            <p className="mt-2 text-xs text-gray-500">Confira os detalhes no seu e-mail.</p>
-          </div>,
-          {
-            duration: 6000,
-            style: {
-              border: '2px solid #FFB6C1',
-              padding: '1rem',
-              color: '#333',
-              background: '#FFF5F7',
-              borderRadius: '12px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-              fontFamily: '"Playfair Display", serif',
-              maxWidth: '400px',
-              fontSize: '14px',
-            },
-            iconTheme: {
-              primary: '#FF8E9B',
-              secondary: '#fff',
-            },
-          }
-        );
+        document.body.appendChild(successBanner);
+
+        // Remover após 4 segundos
+        setTimeout(() => {
+          successBanner.style.opacity = '0';
+          setTimeout(() => {
+            document.body.removeChild(successBanner);
+          }, 300);
+        }, 4000);
+
       } catch (err) {
-        toast.error('Erro ao reservar. Tente novamente.', {
-          style: {
-            border: '2px solid #ff4d4d',
-            background: '#fff0f0',
-            color: '#b30000',
-            fontFamily: '"Playfair Display", serif',
-          },
-          iconTheme: {
-            primary: '#ff4d4d',
-            secondary: '#fff',
-          },
-        });
+        // Erro simples
+        alert('Erro ao reservar. Tente novamente.');
       } finally {
         setModalOpen(false);
         setSelectedGift(null);
       }
     }
   };
-
 
   return (
     <div className="animate-fade-in max-w-5xl mx-auto px-1">

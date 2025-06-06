@@ -7,6 +7,7 @@ export default {
         sans: ['Raleway', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
         lato: ['Lato', 'sans-serif'], // Adicionamos a nova fonte
+        noto: ['Noto Serif', 'serif']
       },
       colors: {
         rose: {
