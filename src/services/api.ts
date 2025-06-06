@@ -2,7 +2,7 @@ import { Gift } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-console.log(API_URL); 
+console.log(API_URL);
 
 
 export const api = {
@@ -92,5 +92,17 @@ export const api = {
       console.error('Erro ao fazer login:', error);
       throw error;
     }
+  },
+
+  async getGiftsPagination(
+    page: number = 1,
+    limit: number = 12,
+    filter: 'all' | 'available' | 'reserved' = 'all',
+    search: string = ''
+  ): Promise<{ data: Gift[]; meta: any }> {
+    const response = await fetch(
+      `${API_URL}/gifts?page=${page}&limit=${limit}&filter=${filter}&search=${search}`
+    );
+    return response.json();
   },
 };

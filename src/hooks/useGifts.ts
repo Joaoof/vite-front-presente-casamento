@@ -34,6 +34,9 @@ export const useGifts = () => {
         body: JSON.stringify(gift),
       });
 
+      console.log(response);
+
+
       if (!response.ok) throw new Error('Failed to add gift');
 
       const newGift = await response.json();

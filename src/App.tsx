@@ -14,7 +14,6 @@ import LoginModal from './components/LoginModal';
 import './styles/animations.css';
 import PhotoCarousel from './components/PhotosCarousel';
 import OurStory from './components/OurStory';
-import { api } from './services/api';
 
 function App() {
   // App configuration
@@ -40,6 +39,7 @@ function App() {
   // UI state
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [giftToEdit, setGiftToEdit] = useState<Gift | null>(null);
+
 
   // Event handlers
   const handleEditGift = (gift: Gift) => {
