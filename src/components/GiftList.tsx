@@ -42,9 +42,7 @@ const GiftList: React.FC<GiftListProps> = ({
     setIsLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-      const response = await fetch(
-        `${API_URL}/gifts`
-      );
+      const response = await fetch(`${API_URL}/gifts`);
 
       if (!response.ok) {
         if (!hasError) {
@@ -56,12 +54,15 @@ const GiftList: React.FC<GiftListProps> = ({
 
       const result = await response.json();
 
-      setGifts(result.data);
-      setTotalItems(result.meta.total);
-      setCurrentPage(result.meta.page);
-      setHasError(false); // Tudo ok, reseta o erro
+      // ✅ Garantir que sempre será um array
+      const data = Array.isArray(result.data) ? result.data : [];
 
+      setGifts(data);
+      setTotalItems(result.meta?.total || data.length); // fallback para length do array
+      setCurrentPage(page);
+      setHasError(false);
     } catch (error) {
+      console.error('Erro ao carregar dados:', error);
       if (!hasError) {
         alert('Erro ao carregar lista de presentes.');
         setHasError(true);
@@ -103,7 +104,6 @@ const GiftList: React.FC<GiftListProps> = ({
             document.body.removeChild(successBanner);
           }, 300);
         }, 4000);
-
       } catch (err) {
         alert('Erro ao reservar. Tente novamente.');
       } finally {

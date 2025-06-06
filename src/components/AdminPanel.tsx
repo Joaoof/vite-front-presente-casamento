@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Gift as GiftType } from '../types';
 import GiftForm from './GiftForm';
 import {
@@ -33,29 +33,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const [openPanel, setOpenPanel] = useState<string | null>('list'); // form | list | export
   const [showExportMessage, setShowExportMessage] = useState(false);
-  const [isExporting, setIsExporting] = useState(false); // Estado para indicar exportação em andamento
+  const [isExporting, setIsExporting] = useState(false);
+  const [giftsState, setGifts] = useState<GiftType[]>(gifts);
   const { isAuthenticated } = useAuth();
+
   if (!isAuthenticated) return null;
 
   const togglePanel = (panel: string) => {
     setOpenPanel(openPanel === panel ? null : panel);
   };
 
-  const handleSubmit = (giftData: Omit<GiftType, 'id' | 'createdAt' | 'status'>) => {
-    onAddGift(giftData);
+  const refreshGifts = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/gifts'); // Use a rota correta da sua API
+      if (!response.ok) {
+        throw new Error('Erro ao carregar presentes');
+      }
+      const data = await response.json();
+      setGifts(data); // Atualiza o estado com os novos presentes
+    } catch (error) {
+      console.error('Erro ao recarregar presentes:', error);
+      alert('Erro ao carregar presentes. Tente novamente mais tarde.');
+    }
+  };
+
+  const handleSubmit = async (giftData: Omit<GiftType, 'id' | 'createdAt' | 'status'>) => {
+    await onAddGift(giftData);
+    await refreshGifts(); // Atualiza a lista após adicionar
     togglePanel('list');
   };
 
   const handleExport = async () => {
-    if (!gifts || gifts.length === 0) {
+    if (!giftsState || giftsState.length === 0) {
       alert('Nenhum presente encontrado para exportar');
       return;
     }
-
     setIsExporting(true);
-
     try {
-      await exportToPdf(gifts);
+      await exportToPdf(giftsState);
       setShowExportMessage(true);
       setTimeout(() => setShowExportMessage(false), 3000);
     } finally {
@@ -63,8 +78,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleUpdate = async (id: string, gift: Partial<GiftType>) => {
+    await onUpdateGift(id, gift);
+    await refreshGifts(); // Atualiza a lista após editar
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este presente?')) {
+      await onDeleteGift(id);
+      await refreshGifts(); // Atualiza a lista após deletar
+    }
+  };
+
   return (
-    <div className="bg-[#] p-4 sm:p-8">
+    <div className="bg-white p-4 sm:p-8">
       {/* Título */}
       <h2 className="text-center text-3xl font-serif text-gray-800 mb-8">Gerenciar Presentes</h2>
 
@@ -91,9 +118,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         onToggle={() => togglePanel('list')}
       >
         <PresentesList
-          gifts={gifts}
-          onUpdateGift={onUpdateGift}
-          onDeleteGift={onDeleteGift}
+          gifts={giftsState}
+          onUpdateGift={handleUpdate}
+          onDeleteGift={handleDelete}
         />
       </AccordionPanel>
 
