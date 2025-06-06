@@ -79,8 +79,8 @@ function App() {
       />
 
       <main className="flex-grow container mx-auto px-8 py-4">
-        <PhotoCarousel />
         <OurStory />
+        <PhotoCarousel />
         {isAuthenticated && (
           <AdminPanel
             gifts={gifts}
