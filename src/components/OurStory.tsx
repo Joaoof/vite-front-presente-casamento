@@ -13,17 +13,17 @@ const OurStory: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="relative">
                     <img
-                        src="https://images.pexels.com/photos/3014856/pexels-photo-3014856.jpeg"
+                        src="https://i.postimg.cc/nhMtkWTX/BCD4443-D-467-A-4-B9-E-817-D-684232-FBA78-E.png"
                         alt="Momento especial do casal"
                         className="rounded-lg shadow-lg"
                     />
-                    <div className="absolute inset-0 bg-rose-500/10 rounded-lg"></div>
+                    <div className="absolute"></div>
                 </div>
 
                 <div className="space-y-6">
                     <div>
                         <h3 className="text-xl font-serif text-gray-800 mb-2">Como Tudo Começou</h3>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="font-noto text-gray-600 leading-relaxed">
                             Nosso primeiro encontro foi em uma cafeteria no centro da cidade.
                             O que era para ser apenas um café rápido se transformou em horas
                             de conversa e muitas risadas.
@@ -35,26 +35,26 @@ const OurStory: React.FC = () => {
                         <ul className="space-y-3">
                             <li className="flex items-start">
                                 <span className="flex-shrink-0 w-16 font-light text-gray-500">2020</span>
-                                <p className="text-gray-600">Primeiro encontro na cafeteria</p>
+                                <p className="font-noto text-gray-600">Primeiro encontro na cafeteria</p>
                             </li>
                             <li className="flex items-start">
                                 <span className="flex-shrink-0 w-16 font-light text-gray-500">2021</span>
-                                <p className="text-gray-600">Primeira viagem juntos</p>
+                                <p className="font-noto text-gray-600">Primeira viagem juntos</p>
                             </li>
                             <li className="flex items-start">
                                 <span className="flex-shrink-0 w-16 font-light text-gray-500">2022</span>
-                                <p className="text-gray-600">Mudança para nossa primeira casa</p>
+                                <p className="font-noto text-gray-600">Mudança para nossa primeira casa</p>
                             </li>
                             <li className="flex items-start">
                                 <span className="flex-shrink-0 w-16 font-light text-gray-500">2023</span>
-                                <p className="text-gray-600">O pedido de casamento</p>
+                                <p className="font-noto text-gray-600">O pedido de casamento</p>
                             </li>
                         </ul>
                     </div>
 
                     <div>
                         <h3 className="text-xl font-serif text-gray-800 mb-2">O Que Nos Une</h3>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="font-noto text-gray-600 leading-relaxed">
                             Além do amor que sentimos um pelo outro, compartilhamos a paixão
                             por viagens, boa gastronomia e momentos em família. Cada dia é
                             uma nova aventura que vivemos juntos.

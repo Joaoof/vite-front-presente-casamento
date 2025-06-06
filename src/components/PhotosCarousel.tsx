@@ -4,25 +4,25 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const photos = [
     {
-        url: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg",
-        caption: "O primeiro encontro"
+        url: 'https://i.postimg.cc/nVYZcBCh/imagem-2025-06-06-113246405.png',
+        caption: '',
     },
     {
-        url: "https://images.pexels.com/photos/1439261/pexels-photo-1439261.jpeg",
-        caption: "Viagem inesquecível"
+        url: 'https://i.postimg.cc/cC1zJKbv/15-E558-CC-EECD-41-D2-8034-041-DA5-A6-D362.png',
+        caption: '',
     },
     {
-        url: "https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg",
-        caption: "Momentos especiais"
+        url: 'https://i.postimg.cc/rmNbcGQ6/6-EC86-FF5-0-E73-4081-9-C84-96230-F17338-C.png',
+        caption: '',
     },
     {
-        url: "https://images.pexels.com/photos/2253870/pexels-photo-2253870.jpeg",
-        caption: "Nossa primeira casa"
+        url: 'https://i.postimg.cc/nhMtkWTX/BCD4443-D-467-A-4-B9-E-817-D-684232-FBA78-E.png',
+        caption: '',
     },
     {
-        url: "https://images.pexels.com/photos/3014856/pexels-photo-3014856.jpeg",
-        caption: "O pedido de casamento"
-    }
+        url: 'https://i.postimg.cc/nVYZcBCh/imagem-2025-06-06-113246405.png',
+        caption: '',
+    },
 ];
 
 const PhotoCarousel: React.FC = () => {
@@ -55,11 +55,11 @@ const PhotoCarousel: React.FC = () => {
                             key={index}
                             className="relative flex-[0_0_100%] min-w-0"
                         >
-                            <div className="relative pt-[56.25%]">
+                            <div className="relative pt-[56%]">
                                 <img
                                     src={photo.url}
                                     alt={photo.caption}
-                                    className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-lg"
+                                    className="absolute inset-0 w-full h-full object-contain rounded-lg shadow-lg"
                                 />
                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-lg">
                                     <p className="text-white text-lg font-light">{photo.caption}</p>
