@@ -7,7 +7,7 @@ const OurStory: React.FC = () => {
             <div className="text-center mb-8">
                 {/* Ícone de folhagem */}
                 <div className="w-10 h-10 mx-auto mb-2">
-                    <img src="https://sdmntprwestus3.oaiusercontent.com/files/00000000-a7c0-61fd-bde0-9d09bd4516f7/raw?se=2025-06-06T18%3A13%3A12Z&sp=r&sv=2024-08-04&sr=b&scid=b99c7f86-adc4-5051-9286-eef9a2a973a5&skoid=9ccea605-1409-4478-82eb-9c83b25dc1b0&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-06T02%3A13%3A40Z&ske=2025-06-07T02%3A13%3A40Z&sks=b&skv=2024-08-04&sig=ipy8aImZ9%2B%2BSwsDbwX0kmlHD995qRyJXRuHHH9wZyhU%3D" alt="" />
+                    <img src="https://i.postimg.cc/28S1bJ01/imagem-2025-06-06-164739601.png" alt="" />
                 </div>
                 <h2 className="text-xl font-serif text-center text-[#9A7B6F]">O CASAL</h2>
             </div>
