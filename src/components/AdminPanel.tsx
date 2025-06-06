@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Gift as GiftType } from '../types';
 import GiftForm from './GiftForm';
 import {
@@ -10,6 +10,9 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { exportToPdf } from '../helpers/export.helper';
 
 interface AdminPanelProps {
   gifts: GiftType[];
@@ -32,7 +35,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showExportMessage, setShowExportMessage] = useState(false);
   const [isExporting, setIsExporting] = useState(false); // Estado para indicar exportação em andamento
   const { isAuthenticated } = useAuth();
-
   if (!isAuthenticated) return null;
 
   const togglePanel = (panel: string) => {
@@ -53,25 +55,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setIsExporting(true);
 
     try {
-      const csvContent =
-        'Nome Presente,Preço,Status,Reservado por\n' +
-        gifts
-          .filter((g) => g.status === 'reserved')
-          .map(
-            (g) =>
-              `${g.name},${g.price?.toFixed(2).replace('.', ',')},${g.status},${g.reservedBy || ''}`,
-          )
-          .join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'presentes-reservados.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
+      await exportToPdf(gifts);
       setShowExportMessage(true);
       setTimeout(() => setShowExportMessage(false), 3000);
     } finally {
@@ -182,10 +166,18 @@ const PresentesList: React.FC<{
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reservado por</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nome
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Preço
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Reservado por
+              </th>
               <th className="relative px-4 py-3"></th>
             </tr>
           </thead>
@@ -193,7 +185,9 @@ const PresentesList: React.FC<{
             {gifts.length > 0 ? (
               gifts.map((gift) => (
                 <tr key={gift.id}>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{gift.name}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {gift.name}
+                  </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                     R$ {gift.price?.toFixed(2).replace('.', ',')}
                   </td>
