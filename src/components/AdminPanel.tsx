@@ -125,7 +125,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       )}
 
       {/* Sidebar Principal - Z-index alto para ficar na frente */}
-      <div className={`fixed right-0 top-0 h-full w-full sm:w-96 md:w-80 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-rose-100 transform transition-all duration-500 ease-out z-[60] ${isOpen ? 'translate-x-0' : 'translate-x-full'
+      <div className={`fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[600px]   bg-white/95 backdrop-blur-xl shadow-2xl border-l border-rose-100 transform transition-all duration-500 ease-out z-[60] ${isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}>
 
         {/* Conteúdo da Sidebar - Só mostra quando não há painel ativo */}
@@ -159,8 +159,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg md:rounded-xl p-3 md:p-4 border border-rose-200/50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-rose-600 text-xs font-semibold uppercase tracking-wide">Total</p>
-                      <p className="text-xl md:text-2xl font-bold text-rose-800">{stats.total}</p>
+                      <p className="text-rose-600 text-ellipsis font-roboto-mono  uppercase tracking-wide">Total</p>
+                      <p className="flex justify-start text-xl md:text-2xl font-bold text-rose-800">{stats.total}</p>
                     </div>
                     <Package className="h-5 w-5 md:h-6 md:w-6 text-rose-500" />
                   </div>
@@ -168,8 +168,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg md:rounded-xl p-3 md:p-4 border border-emerald-200/50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-emerald-600 text-xs font-semibold uppercase tracking-wide">Disponíveis</p>
-                      <p className="text-xl md:text-2xl font-bold text-emerald-800">{stats.available}</p>
+                      <p className="text-emerald-600 text-ellipsis font-roboto-mono uppercase tracking-wide">Disponíveis</p>
+                      <p className="flex justify-start text-xl md:text-2xl font-bold text-emerald-800">{stats.available}</p>
                     </div>
                     <Eye className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" />
                   </div>
@@ -177,8 +177,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg md:rounded-xl p-3 md:p-4 border border-amber-200/50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-amber-600 text-xs font-semibold uppercase tracking-wide">Reservados</p>
-                      <p className="text-xl md:text-2xl font-bold text-amber-800">{stats.reserved}</p>
+                      <p className=" text-amber-600 text-ellipsis font-roboto-mono  uppercase tracking-wide">Reservados</p>
+                      <p className="flex justify-start text-xl md:text-2xl font-bold text-amber-800">{stats.reserved}</p>
                     </div>
                     <Users className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
                   </div>
@@ -186,8 +186,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg md:rounded-xl p-3 md:p-4 border border-purple-200/50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-600 text-xs font-semibold uppercase tracking-wide">Valor</p>
-                      <p className="text-base md:text-lg font-bold text-purple-800">R$ {stats.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                      <p className="text-purple-600 text-ellipsis font-roboto-mono uppercase tracking-wide">Valor</p>
+                      <p className="flex justify-start text-base md:text-lg font-bold text-purple-800">R$ {stats.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                     </div>
                     <DollarSign className="h-5 w-5 md:h-6 md:w-6 text-purple-500" />
                   </div>
