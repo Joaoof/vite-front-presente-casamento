@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import { X, Lock, User, Heart } from 'lucide-react';
 import Toast from './Toast';
 import { api } from '../services/api';
-
-const useAuth = () => ({
-  login: (accessToken: string) => {
-    console.log('Logged in with token:', accessToken);
-    localStorage.setItem('accessToken', accessToken);
-  }
-});
+import { useAuth } from '../hooks/useAuth';
 
 interface LoginModalProps {
   isOpen: boolean;
