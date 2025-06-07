@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Gift as GiftType } from '../types';
-import { X, Gift, ImagePlus, AlertCircle } from 'lucide-react';
+import { Gift, ImagePlus, AlertCircle, X } from 'lucide-react';
 
 interface GiftFormProps {
   onSubmit: (gift: Omit<GiftType, 'id' | 'createdAt' | 'status'>) => void;
@@ -52,15 +52,13 @@ const GiftForm: React.FC<GiftFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6 animate-fade-in">
+    <div className="bg-white rounded-xl shadow-lg p-6 mb-6 animate-fade-in max-w-xl w-full">
       <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
         <div>
           <h2 className="text-2xl font-serif text-gray-800 mb-1">
             {isEdit ? 'Editar Presente' : 'Adicionar Presente'}
           </h2>
-          <p className="text-sm text-gray-500">
-            Preencha os detalhes do presente abaixo
-          </p>
+          <p className="text-sm text-gray-500">Preencha os detalhes do presente abaixo</p>
         </div>
         <button
           onClick={onCancel}
@@ -70,7 +68,11 @@ const GiftForm: React.FC<GiftFormProps> = ({
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Ensure the form is scrollable on smaller screens */}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 overflow-y-auto overscroll-contain h-full max-h-[60vh] custom-scrollbar"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-6">
             <div>
@@ -187,7 +189,8 @@ const GiftForm: React.FC<GiftFormProps> = ({
           />
         </div>
 
-        <div className="flex justify-end items-center gap-3 pt-4 border-t border-gray-100">
+        {/* Ensure the buttons are always visible */}
+        <div className="flex justify-end items-center gap-3 pt-4 border-t border-gray-100 mt-4">
           <button
             type="button"
             onClick={onCancel}
