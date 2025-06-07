@@ -291,7 +291,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       {activePanel === 'manage' && 'Gerenciar Presentes'}
                       {activePanel === 'form' && 'Formulário'}
                     </h3>
-                    <p className="text-xs text-rose-600 font-medium">
+                    <p className="text-xs flex justify-start text-rose-600 font-medium">
                       {activePanel === 'dashboard' && 'Estatísticas detalhadas'}
                       {activePanel === 'manage' && 'Editar presentes'}
                       {activePanel === 'form' && 'Adicionar item'}
