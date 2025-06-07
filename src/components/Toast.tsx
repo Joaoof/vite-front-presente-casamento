@@ -1,83 +1,133 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { Check, X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
-interface ToastProps {
+export interface ToastProps {
+    id?: string;
     show: boolean;
     message: string;
+    type?: 'success' | 'error' | 'warning' | 'info';
     duration?: number;
     onClose?: () => void;
+    position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center';
 }
 
-export const Toast: React.FC<ToastProps> = ({
+const Toast: React.FC<ToastProps> = ({
     show,
     message,
-    duration = 3000,
+    type = 'success',
+    duration = 4000,
     onClose,
+    position = 'top-right'
 }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isLeaving, setIsLeaving] = useState(false);
 
     useEffect(() => {
         if (show) {
             setIsVisible(true);
+            setIsLeaving(false);
 
             const timer = setTimeout(() => {
-                setIsClosing(true);
-
-                setTimeout(() => {
-                    setIsVisible(false);
-                    setIsClosing(false);
-                    if (onClose) onClose();
-                }, 500); // Animation duration
-
+                handleClose();
             }, duration);
 
             return () => clearTimeout(timer);
         }
-    }, [show, duration, onClose]);
+    }, [show, duration]);
 
-    if (!isVisible && !show) return null;
+    const handleClose = () => {
+        setIsLeaving(true);
+        setTimeout(() => {
+            setIsVisible(false);
+            onClose?.();
+        }, 300);
+    };
+
+    if (!show && !isVisible) return null;
+
+    const getIcon = () => {
+        switch (type) {
+            case 'success':
+                return <Check size={20} className="text-emerald-600" />;
+            case 'error':
+                return <X size={20} className="text-red-600" />;
+            case 'warning':
+                return <AlertTriangle size={20} className="text-amber-600" />;
+            case 'info':
+                return <Info size={20} className="text-blue-600" />;
+            default:
+                return <Check size={20} className="text-emerald-600" />;
+        }
+    };
+
+    const getColorClasses = () => {
+        switch (type) {
+            case 'success':
+                return 'bg-emerald-50 border-emerald-200 text-emerald-800';
+            case 'error':
+                return 'bg-red-50 border-red-200 text-red-800';
+            case 'warning':
+                return 'bg-amber-50 border-amber-200 text-amber-800';
+            case 'info':
+                return 'bg-blue-50 border-blue-200 text-blue-800';
+            default:
+                return 'bg-emerald-50 border-emerald-200 text-emerald-800';
+        }
+    };
+
+    const getPositionClasses = () => {
+        switch (position) {
+            case 'top-right':
+                return 'top-4 right-4';
+            case 'top-left':
+                return 'top-4 left-4';
+            case 'bottom-right':
+                return 'bottom-4 right-4';
+            case 'bottom-left':
+                return 'bottom-4 left-4';
+            case 'top-center':
+                return 'top-4 left-1/2 -translate-x-1/2';
+            default:
+                return 'top-4 right-4';
+        }
+    };
+
+    const getAnimationClasses = () => {
+        if (isLeaving) {
+            return 'animate-toast-out';
+        }
+        return 'animate-toast-in';
+    };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+        <div className={`fixed z-[60] ${getPositionClasses()}`}>
             <div
                 className={`
-          max-w-md w-full mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden
-          pointer-events-auto transform transition-all duration-500 
-          ${isClosing ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
-          relative
+          flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg backdrop-blur-sm
+          ${getColorClasses()}
+          ${getAnimationClasses()}
+          min-w-[300px] max-w-[400px]
         `}
             >
-                {/* Rotating background image */}
-                <div className="absolute inset-0 overflow-hidden z-0">
-                    <div
-                        className="absolute inset-0 bg-gradient-to-r from-rose-100 via-pink-50 to-rose-100 
-            animate-gradient-x opacity-60"
-                    />
-                    <div
-                        className="absolute inset-0 bg-[url('https://images.pexels.com/photos/7130560/pexels-photo-7130560.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')] 
-            bg-cover bg-center animate-slow-rotate mix-blend-overlay opacity-20"
-                    />
+                <div className="flex-shrink-0">
+                    {getIcon()}
                 </div>
 
-                <div className="relative z-10 p-5 flex items-center">
-                    <div className="flex-shrink-0 mr-3">
-                        <div className="bg-green-50 rounded-full p-1.5">
-                            <CheckCircle2 className="w-6 h-6 text-green-500 animate-success-pop" />
-                        </div>
-                    </div>
-
-                    <div className="flex-grow">
-                        <div className="flex justify-between items-start">
-                            <p className="text-gray-800 font-medium">{message}</p>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-0.5">Você está conectado agora</p>
-                    </div>
+                <div className="flex-1">
+                    <p className="text-sm font-medium leading-relaxed">
+                        {message}
+                    </p>
                 </div>
 
-                {/* Animated success indicator */}
-                <div className="h-1 bg-gradient-to-r from-green-300 to-green-500 animate-shrink" />
+                <button
+                    onClick={handleClose}
+                    className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-white/50 rounded"
+                >
+                    <X size={16} />
+                </button>
             </div>
         </div>
     );
-};      
+};
+
+export default Toast;

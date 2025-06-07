@@ -59,7 +59,7 @@ function App() {
     }
   };
 
-  const handleReserveGift = async (id: string, reservedBy: string) => {
+  const handleReserveGift = async (id: string, reservedBy: string) => { 
     try {
       await reserveGift(id, reservedBy);
     } catch (error) {
