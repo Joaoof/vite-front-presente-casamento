@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -19,12 +19,14 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
     onConfirm,
     giftName,
     giftPrice,
-    giftDescription,
 }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+
+    const nameInputRef = useRef<HTMLInputElement>(null);
 
     const validateForm = () => {
         const newErrors: { name?: string; email?: string } = {};
@@ -50,15 +52,18 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
 
         try {
             // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 1200));
             const reservedBy = `${name.trim()} <${email.trim()}>`;
-            onConfirm(reservedBy);
 
-            // Reset form
-            setName('');
-            setEmail('');
-            setErrors({});
-            onClose();
+            setIsSuccess(true);
+
+            // Wait for success animation then close
+            setTimeout(() => {
+                onConfirm(reservedBy);
+                resetForm();
+                onClose();
+            }, 1000);
+
         } catch (error) {
             console.error('Error submitting reservation:', error);
         } finally {
@@ -66,101 +71,131 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
         }
     };
 
+    const resetForm = () => {
+        setName('');
+        setEmail('');
+        setErrors({});
+        setIsSubmitting(false);
+        setIsSuccess(false);
+    };
+
     const handleClose = () => {
-        if (!isSubmitting) {
-            setName('');
-            setEmail('');
-            setErrors({});
+        if (!isSubmitting && !isSuccess) {
+            resetForm();
             onClose();
         }
     };
 
+    // Focus management
+    useEffect(() => {
+        if (isOpen) {
+            resetForm();
+            setTimeout(() => nameInputRef.current?.focus(), 100);
+        }
+    }, [isOpen]);
+
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-lg bg-[#FFF0E6] border border-[#DAC8C8] shadow-2xl rounded-lg overflow-hidden p-0 max-h-[90vh]">
-                {/* Header Section */}
-                <div className="bg-gradient-to-r from-[#B6C5D5] to-[#849CAF] border-b border-[#DAC8C8] px-8 py-6 relative">
-                    {/* Close button */}
+            <DialogContent className="w-[95vw] max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border-0 p-0 max-h-[85vh] flex flex-col">
+
+                {/* Success Overlay */}
+                {isSuccess && (
+                    <div className="absolute inset-0 bg-green-500/95 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+                        <div className="text-center text-white">
+                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                                <Check size={32} />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">Reserva Confirmada!</h3>
+                            <p className="text-green-100">Processando...</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Header */}
+                <div className="bg-gradient-to-r from-rose-400 to-pink-500 px-6 py-6 relative">
                     <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 p-1.5 text-[] hover:text-white hover:bg-[#]/80 rounded-md transition-all duration-200"
-                        disabled={isSubmitting}
+                        className="absolute top-4 right-4 p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-all duration-200"
+                        disabled={isSubmitting || isSuccess}
+                        aria-label="Fechar"
                     >
-                        <X size={18} />
+                        <X size={20} />
                     </button>
+
                     <div className="text-center">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#F1B7A9] border border-[#E6A892] rounded-lg mb-4">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-3">
                             <Heart size={24} className="text-white" />
                         </div>
-                        <DialogHeader className="space-y-2">
-                            <DialogTitle className="text-2xl font-noto">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl font-bold text-white mb-1">
                                 Reservar Presente
                             </DialogTitle>
-                            <DialogDescription className="text-sm font-noto">
-                                Preencha os dados abaixo para confirmar sua reserva
+                            <DialogDescription className="text-white/90 text-sm">
+                                Confirme seus dados para reservar
                             </DialogDescription>
                         </DialogHeader>
                     </div>
                 </div>
 
-                {/* Gift Information Section */}
-                <div className="bg-[#FFF0E6] border-b border-[#DAC8C8] px-8 py-4">
-                    <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-10 h-10 bg-[#F1B7A9] border border-[#E6A892] rounded-lg flex items-center justify-center">
-                            <Gift size={20} className="text-[#849CAF]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-xl font-noto text-lg">{giftName}</h3>
-                            {giftDescription && (
-                                <p className="text-[#DAC8C8] text-sm mt-1">{giftDescription}</p>
-                            )}
-                            {giftPrice && (
-                                <p className="text-[#849CAF] font-semibold mt-2">
-                                    R$ {giftPrice.toFixed(2).replace('.', ',')}
-                                </p>
-                            )}
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto">
+                    {/* Gift Info */}
+                    <div className="px-6 py-4 bg-gray-50 border-b">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Gift size={20} className="text-rose-500" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h3 className="font-noto monetary-value text-sm leading-tight">{giftName}</h3>
+                                {giftPrice && (
+                                    <p className="text-rose-600 font-bold text-lg mt-1">
+                                        R$ {giftPrice.toFixed(2).replace('.', ',')}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Form Section */}
-                <form onSubmit={handleSubmit} className="px-8 py-6 space-y-6">
-                    <div className="space-y-4">
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="px-6 py-6 space-y-5">
+                        {/* Name Field */}
                         <div>
-                            <label className="block text-sm font-noto mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Nome Completo *
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User size={18} className="text" />
-                                </div>
+                                <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <Input
+                                    ref={nameInputRef}
                                     value={name}
                                     onChange={(e) => {
                                         setName(e.target.value);
                                         if (errors.name) setErrors(prev => ({ ...prev, name: undefined }));
                                     }}
-                                    placeholder="Digite seu nome completo"
-                                    className={`pl-10 h-11 border-[#849caf] rounded-md focus:border-[#849caf] focus:ring-[#849caf] transition-colors ${errors.name ? 'border-red-300 bg-red-50' : 'bg-[#FFF0E6]'
+                                    placeholder="Seu nome completo"
+                                    className={`pl-10 h-12 rounded-xl border-2 transition-all duration-200 ${errors.name
+                                        ? 'border-red-300 bg-red-50 focus:border-red-500'
+                                        : 'border-gray-200 focus:border-rose-400 hover:border-gray-300'
                                         }`}
                                     disabled={isSubmitting}
+                                    autoComplete="name"
                                 />
                                 {errors.name && (
-                                    <div className="flex items-center gap-2 mt-1 text-red-600 text-sm">
+                                    <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
                                         <AlertCircle size={14} />
                                         {errors.name}
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* Email Field */}
                         <div>
-                            <label className="block text-sm font-noto mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 E-mail *
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail size={18} className="" />
-                                </div>
+                                <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <Input
                                     value={email}
                                     onChange={(e) => {
@@ -169,60 +204,62 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                                     }}
                                     placeholder="seu@email.com"
                                     type="email"
-                                    className={`pl-10 h-11 border-[#849caf] rounded-md focus:border-[#849caf] focus:ring-[#849caf] transition-colors ${errors.email ? 'border-red-300 bg-red-50' : 'bg-[#FFF0E6]'
+                                    className={`pl-10 h-12 rounded-xl border-2 transition-all duration-200 ${errors.email
+                                        ? 'border-red-300 bg-red-50 focus:border-red-500'
+                                        : 'border-gray-200 focus:border-rose-400 hover:border-gray-300'
                                         }`}
                                     disabled={isSubmitting}
+                                    autoComplete="email"
                                 />
                                 {errors.email && (
-                                    <div className="flex items-center gap-2 mt-1 text-red-600 text-sm">
+                                    <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
                                         <AlertCircle size={14} />
                                         {errors.email}
                                     </div>
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    {/* Action Buttons */}
-                    <div className="border-t border-[#F1B7A9] pt-6 -mx-8 px-8">
-                        <div className="flex gap-3">
-                            <Button
-                                type="button"
-                                variant="primary"
-                                onClick={handleClose}
-                                className="flex-1 h-11 font-noto bg-slate-300 hover:bg-[#b6c5d5] hover:border-[#F1B7A9] transition-colors"
-                                disabled={isSubmitting}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                type="submit"
-                                className="flex-1 h-11 bg-[#F1B7A9] hover:bg-[#E6A892] text-black font-noto rounded-md font-medium shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-100 disabled:cursor-not-allowed"
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Processando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Check size={18} />
-                                        Confirmar Reserva
-                                    </>
-                                )}
-                            </Button>
-                        </div>
+                {/* Fixed Footer */}
+                <div className="border-t bg-white px-6 py-4">
+                    <div className="flex gap-3">
+                        <Button
+                            type="button"
+                            variant="primary"
+                            onClick={handleClose}
+                            className="flex-1 h-12 rounded-xl font-medium border-gray-300 text-gray-700 hover:bg-gray-50"
+                            disabled={isSubmitting || isSuccess}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            onClick={handleSubmit}
+                            className="flex-1 h-12 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
+                            disabled={isSubmitting || isSuccess}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Confirmando...
+                                </>
+                            ) : (
+                                <>
+                                    <Check size={18} />
+                                    Confirmar
+                                </>
+                            )}
+                        </Button>
                     </div>
 
                     {/* Security Notice */}
-                    <div className="text-center pt-2 -mx-8 px-8">
-                        <div className="flex items-center justify-center gap-2 text-xs text-[#DAC8C8]">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span>Seus dados estão protegidos</span>
-                        </div>
+                    <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-3">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span>Dados protegidos e seguros</span>
                     </div>
-                </form>
+                </div>
             </DialogContent>
         </Dialog>
     );

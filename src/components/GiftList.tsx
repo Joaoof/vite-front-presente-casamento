@@ -95,25 +95,43 @@ const GiftList: React.FC<GiftListProps> = ({
     setModalOpen(true);
   };
 
+  const showSuccessToast = (giftName: string) => {
+    // Create minimalist toast
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-lg transition-all duration-300 ease-out opacity-0 translate-y-[-10px]';
+    toast.style.maxWidth = '90%';
+    toast.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        <span class="text-sm font-medium">Presente reservado com sucesso, confira mais informações em seu e-mail</span>
+      </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    });
+
+    // Animate out and remove
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-10px)';
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  };
+
   const handleConfirmReservation = async (reservedBy: string) => {
     if (selectedGift) {
       try {
         await onReserveGift(selectedGift.id, reservedBy);
-
-        const successBanner = document.createElement('div');
-        successBanner.className =
-          'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 ease-in-out';
-        successBanner.style.maxWidth = '90%';
-        successBanner.innerText = `✅ Você reservou "${selectedGift.name}"!`;
-
-        document.body.appendChild(successBanner);
-
-        setTimeout(() => {
-          successBanner.style.opacity = '0';
-          setTimeout(() => {
-            document.body.removeChild(successBanner);
-          }, 300);
-        }, 4000);
+        showSuccessToast(selectedGift.name);
       } catch (err) {
         alert('Erro ao reservar. Tente novamente.');
       } finally {
@@ -184,7 +202,7 @@ const GiftList: React.FC<GiftListProps> = ({
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pages.push(<span key="ellipsis2" className="px-2 text-gray-400">...</span>);
+        pages.push(<span key="ellipsis2\" className="px-2 text-gray-400">...</span>);
       }
       pages.push(
         <button
