@@ -23,6 +23,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { exportToPdf } from '../helpers/export.helper';
+import { api } from '../services/api';
 
 interface AdminSidebarProps {
   gifts: GiftType[];
@@ -81,15 +82,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    const response = await fetch(`http://localhost:3000/gifts/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) {
-      alert('Erro ao excluir presente. Tente novamente mais tarde.');
-      return;
-    }
+    const response = await api.deleteGift(id);
+    console.log('Delete response:', response);
     if (window.confirm('Tem certeza que deseja excluir este presente?')) {
-      await onDeleteGift(id);
+       onDeleteGift(id);
     }
   };
 

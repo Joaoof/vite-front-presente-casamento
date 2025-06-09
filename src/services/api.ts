@@ -58,7 +58,7 @@ export const api = {
     return response.json();
   },
 
-  async deleteGift(id: string): Promise<void> {
+  async deleteGift(id: string) {
     try {
       const response = await fetch(`${API_URL}/gifts/${id}`, {
         method: 'DELETE',
