@@ -322,8 +322,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               {activePanel === 'manage' && (
                 <ManagePanel
                   gifts={gifts}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
+                  onUpdateGift={handleUpdate}
+                  onDeleteGift={handleDelete}
                 />
               )}
               {activePanel === 'form' && (
@@ -531,7 +531,7 @@ const ManagePanel: React.FC<{
                 <span>Editar</span>
               </button>
               <button
-                onClick={() => onDelete(gift.id)}
+                onClick={() => onDeleteGift(gift.id)}
                 className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white px-3 py-2 md:py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium active:scale-95"
               >
                 <Trash2 size={12} />
