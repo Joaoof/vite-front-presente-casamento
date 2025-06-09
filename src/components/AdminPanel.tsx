@@ -81,6 +81,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   const handleDelete = async (id: string) => {
+    const response = await fetch(`http://localhost:3000/gifts/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      alert('Erro ao excluir presente. Tente novamente mais tarde.');
+      return;
+    }
     if (window.confirm('Tem certeza que deseja excluir este presente?')) {
       await onDeleteGift(id);
     }
@@ -470,9 +477,9 @@ const DashboardPanel: React.FC<{ stats: any; gifts: GiftType[] }> = ({ stats, gi
 // Manage Panel Component - Responsivo
 const ManagePanel: React.FC<{
   gifts: GiftType[];
-  onUpdate: (id: string, gift: Partial<GiftType>) => void;
-  onDelete: (id: string) => void;
-}> = ({ gifts, onUpdate, onDelete }) => {
+  onUpdateGift: (id: string, gift: Partial<GiftType>) => void;
+  onDeleteGift: (id: string) => void;
+}> = ({ gifts, onUpdateGift, onDeleteGift }) => {
   return (
     <div className="space-y-3 md:space-y-4">
       {gifts.length > 0 ? (
