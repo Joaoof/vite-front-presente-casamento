@@ -63,7 +63,8 @@ export const api = {
       const response = await fetch(`${API_URL}/gifts/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json',
         },
       });
       if (!response.ok) throw new Error('Falha ao deletar presente');
