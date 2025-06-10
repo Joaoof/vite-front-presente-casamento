@@ -78,6 +78,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   const handleUpdate = async (id: string, gift: Partial<GiftType>) => {
+    const response = await api.updateGift(id, gift);
+    console.log('Update response:', response);
+    if (window.confirm('Tem certeza que deseja atualizar este presente?')) {
+      await onUpdateGift(id, gift);
+    }
+
     await onUpdateGift(id, gift);
   };
 
@@ -85,7 +91,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     const response = await api.deleteGift(id);
     console.log('Delete response:', response);
     if (window.confirm('Tem certeza que deseja excluir este presente?')) {
-       onDeleteGift(id);
+      onDeleteGift(id);
     }
   };
 
@@ -520,7 +526,7 @@ const ManagePanel: React.FC<{
 
             <div className="flex space-x-2">
               <button
-                onClick={() => {/* Edit functionality will be handled by parent */ }}
+                onClick={() => { onUpdateGift(gift.id, gift) }}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-3 py-2 md:py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium active:scale-95"
               >
                 <Edit size={12} />
@@ -530,7 +536,7 @@ const ManagePanel: React.FC<{
                 onClick={() => onDeleteGift(gift.id)}
                 className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white px-3 py-2 md:py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center space-x-1 text-xs font-medium active:scale-95"
               >
-                <Trash2 size={12} />
+                <Trash2 size={12} />  
                 <span>Excluir</span>
               </button>
             </div>

@@ -72,10 +72,14 @@ export const useGifts = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}`, {
         method: 'DELETE',
+
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json',
         },
       });
+      console.log(response);
+
 
       if (!response.ok) throw new Error('Failed to delete gift');
 

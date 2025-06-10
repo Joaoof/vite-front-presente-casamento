@@ -58,6 +58,23 @@ export const api = {
     return response.json();
   },
 
+  async updateGift(id: string, updates: Partial<Gift>): Promise<Gift> {
+    try {
+      const response = await fetch(`${API_URL}/gifts/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      })
+      return response.json();
+    } catch (error) {
+      console.error('Erro ao atualizar presente:', error);
+      throw error;
+    }
+  },
+
   async deleteGift(id: string) {
     try {
       const response = await fetch(`${API_URL}/gifts/${id}`, {
