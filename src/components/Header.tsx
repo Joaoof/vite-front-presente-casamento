@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Heart, Music } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -19,14 +19,30 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [showMusicPrompt, setShowMusicPrompt] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [iframeKey, setIframeKey] = useState(0); // Para recarregar o iframe
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const togglePlay = () => {
-    if (!isPlaying) {
-      // Força recarregar o iframe para garantir autoplay no iOS
-      setIframeKey((prev) => prev + 1);
+    if (!audioRef.current) return;
+
+    const playPromise = audioRef.current.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((error) => {
+          console.error('Erro ao tocar a música:', error);
+          toast.warn('Clique novamente para ativar a música.');
+        });
     }
-    setIsPlaying(!isPlaying);
+  };
+
+  const pauseMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
   };
 
   const hidePrompt = () => {
@@ -35,6 +51,9 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
+      {/* Áudio oculto */}
+      <audio ref={audioRef} loop src="/audio/fundo.mp3" />
+
       {/* Prompt de música */}
       {showMusicPrompt && (
         <div className="fixed bottom-4 right-4 z-50 bg-white p-3 rounded-lg shadow-lg border border-gray-200 flex flex-col items-center gap-2 animate-fade-in">
@@ -59,28 +78,12 @@ const Header: React.FC<HeaderProps> = ({
       {/* Ícone de música tocando */}
       {isPlaying && (
         <button
-          onClick={togglePlay}
+          onClick={pauseMusic}
           className="fixed bottom-4 right-4 z-50 bg-white p-2 rounded-full shadow-lg border border-gray-200 flex items-center justify-center animate-pulse"
           aria-label="Pausar música"
         >
           <MusicNoteIcon />
         </button>
-      )}
-
-      {/* Iframe do YouTube - oculto visualmente */}
-      {isPlaying && (
-        <div className="fixed bottom-0 left-0 w-1 h-1 opacity-0 overflow-hidden pointer-events-none">
-          <iframe
-            key={iframeKey}
-            width="1"
-            height="1"
-            src={`https://www.youtube.com/embed/nLnp0tpZ0ok?autoplay=1&loop=1&playlist=nLnp0tpZ0ok&controls=0&modestbranding=1&showinfo=0&rel=0`}
-            title="Música de Fundo"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
       )}
 
       {/* Cabeçalho principal */}
