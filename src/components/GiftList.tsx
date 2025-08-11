@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Gift } from '../types';
 import GiftItem from './GiftItem';
 import { ChevronLeft, ChevronRight, PresentationIcon } from 'lucide-react';
@@ -13,7 +13,6 @@ interface GiftListProps {
   filter: 'all' | 'available' | 'reserved';
   searchTerm: string;
   onFilterChange: (filter: 'all' | 'available' | 'reserved') => void;
-  gifts: Gift[];
   onSearchChange: (term: string) => void;
 }
 
@@ -27,17 +26,18 @@ const GiftList: React.FC<GiftListProps> = ({
   coupleNames,
   filter,
   onFilterChange,
+  searchTerm,
+  onSearchChange,
 }) => {
   const [gifts, setGifts] = useState<Gift[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [hasError, setHasError] = useState(false);
 
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  const fetchGifts = async (page: number) => {
+  // Busca todos os presentes (uma única vez por filtro)
+  const fetchGifts = async () => {
     setIsLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -58,19 +58,13 @@ const GiftList: React.FC<GiftListProps> = ({
       }
 
       const result = await response.json();
-
-      console.log(result);
-
-
-      // ✅ Garantir que sempre será um array
-      const data = Array.isArray(result) ? result : [];;
-      console.log(data);
-
+      const data = Array.isArray(result) ? result : [];
 
       setGifts(data);
-      setTotalItems(result.meta?.total || data.length); // fallback para length do array
-      setCurrentPage(page);
       setHasError(false);
+
+      // Reset para primeira página ao recarregar dados
+      setCurrentPage(1);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       if (!hasError) {
@@ -82,13 +76,35 @@ const GiftList: React.FC<GiftListProps> = ({
     }
   };
 
+  // Recarrega quando filtro muda
   useEffect(() => {
-    fetchGifts(1);
+    fetchGifts();
   }, [filter]);
 
-  useEffect(() => {
-    fetchGifts(currentPage);
-  }, [currentPage]);
+  // Filtra e busca no front-end
+  const filteredGifts = useMemo(() => {
+    return gifts
+      .filter((gift) => {
+        // Filtro por status
+        if (filter === 'available' && gift.status) return false;
+        if (filter === 'reserved' && !gift.status) return false;
+        return true;
+      })
+      .filter((gift) =>
+        gift.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      )
+      .sort((a, b) => a.name.localeCompare(b.name)); // Ordena A-Z
+  }, [gifts, filter, searchTerm]);
+
+  const totalPages = Math.ceil(filteredGifts.length / ITEMS_PER_PAGE);
+
+  // Itens da página atual
+  const paginatedGifts = useMemo(() => {
+    return filteredGifts.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }, [filteredGifts, currentPage]);
 
   const handleOpenModal = (gift: Gift) => {
     setSelectedGift(gift);
@@ -96,9 +112,9 @@ const GiftList: React.FC<GiftListProps> = ({
   };
 
   const showSuccessToast = (giftName: string) => {
-    // Create minimalist toast
     const toast = document.createElement('div');
-    toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-lg transition-all duration-300 ease-out opacity-0 translate-y-[-10px]';
+    toast.className =
+      'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-lg transition-all duration-300 ease-out opacity-0 translate-y-[-10px]';
     toast.style.maxWidth = '90%';
     toast.innerHTML = `
       <div class="flex items-center gap-3">
@@ -109,13 +125,11 @@ const GiftList: React.FC<GiftListProps> = ({
 
     document.body.appendChild(toast);
 
-    // Animate in
     requestAnimationFrame(() => {
       toast.style.opacity = '1';
       toast.style.transform = 'translateX(-50%) translateY(0)';
     });
 
-    // Animate out and remove
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateX(-50%) translateY(-10px)';
@@ -137,7 +151,7 @@ const GiftList: React.FC<GiftListProps> = ({
       } finally {
         setModalOpen(false);
         setSelectedGift(null);
-        fetchGifts(currentPage); // Atualiza a lista após reserva
+        fetchGifts(); // Recarrega todos os presentes após reserva
       }
     }
   };
@@ -202,7 +216,7 @@ const GiftList: React.FC<GiftListProps> = ({
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pages.push(<span key="ellipsis2\" className="px-2 text-gray-400">...</span>);
+        pages.push(<span key="ellipsis2" className="px-2 text-gray-400">...</span>);
       }
       pages.push(
         <button
@@ -264,11 +278,13 @@ const GiftList: React.FC<GiftListProps> = ({
       </div>
 
       {/* Informações da paginação */}
-      {gifts.length > 0 && (
+      {filteredGifts.length > 0 && (
         <div className="text-center mb-4">
           <p className="text-sm text-gray-600">
-            Mostrando {currentPage * ITEMS_PER_PAGE - ITEMS_PER_PAGE + 1}-{' '}
-            {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)} de {totalItems} presentes
+            Mostrando{' '}
+            {paginatedGifts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}-
+            {Math.min(currentPage * ITEMS_PER_PAGE, filteredGifts.length)} de{' '}
+            {filteredGifts.length} presentes
           </p>
         </div>
       )}
@@ -277,10 +293,14 @@ const GiftList: React.FC<GiftListProps> = ({
         <div className="text-center py-8">
           <p className="text-gray-500">Carregando...</p>
         </div>
-      ) : gifts.length === 0 ? (
+      ) : paginatedGifts.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500 text-sm">Nenhum presente encontrado.</p>
-          {isAdmin && (
+          <p className="text-gray-500 text-sm">
+            {gifts.length === 0
+              ? 'Nenhum presente encontrado.'
+              : 'Nenhum presente corresponde aos filtros.'}
+          </p>
+          {isAdmin && gifts.length === 0 && (
             <p className="text-gray-500 text-sm mt-2">
               Adicione presentes à lista clicando no botão acima.
             </p>
@@ -289,7 +309,7 @@ const GiftList: React.FC<GiftListProps> = ({
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-3 sm:gap-4">
-            {gifts.map((gift) => (
+            {paginatedGifts.map((gift) => (
               <GiftItem
                 key={gift.id}
                 gift={gift}
