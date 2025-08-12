@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Gift } from '../types';
 import GiftItem from './GiftItem';
-import { ChevronLeft, ChevronRight, PresentationIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react'; // ✅ Adicionado Search
 import ReservationModal from './ReservationModal';
 
 interface GiftListProps {
@@ -62,9 +62,7 @@ const GiftList: React.FC<GiftListProps> = ({
 
       setGifts(data);
       setHasError(false);
-
-      // Reset para primeira página ao recarregar dados
-      setCurrentPage(1);
+      setCurrentPage(1); // Reset da página ao recarregar
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       if (!hasError) {
@@ -76,16 +74,14 @@ const GiftList: React.FC<GiftListProps> = ({
     }
   };
 
-  // Recarrega quando filtro muda
   useEffect(() => {
     fetchGifts();
   }, [filter]);
 
-  // Filtra e busca no front-end
+  // Filtragem com case-insensitive já garantida
   const filteredGifts = useMemo(() => {
     return gifts
       .filter((gift) => {
-        // Filtro por status
         if (filter === 'available' && gift.status) return false;
         if (filter === 'reserved' && !gift.status) return false;
         return true;
@@ -93,12 +89,10 @@ const GiftList: React.FC<GiftListProps> = ({
       .filter((gift) =>
         gift.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
       )
-      .sort((a, b) => a.name.localeCompare(b.name)); // Ordena A-Z
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [gifts, filter, searchTerm]);
 
   const totalPages = Math.ceil(filteredGifts.length / ITEMS_PER_PAGE);
-
-  // Itens da página atual
   const paginatedGifts = useMemo(() => {
     return filteredGifts.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
@@ -151,7 +145,7 @@ const GiftList: React.FC<GiftListProps> = ({
       } finally {
         setModalOpen(false);
         setSelectedGift(null);
-        fetchGifts(); // Recarrega todos os presentes após reserva
+        fetchGifts(); // Atualiza lista após reserva
       }
     }
   };
@@ -206,8 +200,7 @@ const GiftList: React.FC<GiftListProps> = ({
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`w-8 h-8 rounded text-sm transition-colors ${i === currentPage ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'
-            }`}
+          className={`w-8 h-8 rounded text-sm transition-colors ${i === currentPage ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'}`}
         >
           {i}
         </button>
@@ -274,6 +267,20 @@ const GiftList: React.FC<GiftListProps> = ({
             <option value="available">Disponíveis</option>
             <option value="reserved">Reservados</option>
           </select>
+        </div>
+      </div>
+
+      {/* 🔍 Campo de pesquisa com lupa */}
+      <div className="mb-6">
+        <div className="relative max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Pesquisar presentes..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
       </div>
 
