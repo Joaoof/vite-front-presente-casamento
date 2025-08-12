@@ -3,6 +3,8 @@ import { Gift } from '../types';
 import GiftItem from './GiftItem';
 import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react';
 import ReservationModal from './ReservationModal';
+import ViewDetailsModal from './ViewDetailsModal'; // ✅ Importe o novo modal
+
 
 interface GiftListProps {
   isAdmin: boolean;
@@ -32,7 +34,8 @@ const GiftList: React.FC<GiftListProps> = ({
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [isReservationModalOpen, setReservationModalOpen] = useState(false);
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -103,7 +106,12 @@ const GiftList: React.FC<GiftListProps> = ({
 
   const handleOpenModal = (gift: Gift) => {
     setSelectedGift(gift);
-    setModalOpen(true);
+    setReservationModalOpen(true);
+  };
+
+  const handleViewDetails = (gift: Gift) => {
+    setSelectedGift(gift);
+    setDetailsModalOpen(true); // Abre o modal de detalhes
   };
 
   const showSuccessToast = (giftName: string) => {
@@ -144,7 +152,7 @@ const GiftList: React.FC<GiftListProps> = ({
       } catch (err) {
         alert('Erro ao reservar. Tente novamente.');
       } finally {
-        setModalOpen(false);
+        setReservationModalOpen(false);
         setSelectedGift(null);
         fetchGifts(); // Atualiza lista após reserva
       }
@@ -335,7 +343,7 @@ const GiftList: React.FC<GiftListProps> = ({
                 isAdmin={isAdmin}
                 onEdit={() => onEditGift(gift)}
                 onDelete={() => onDeleteGift(gift.id)}
-                onReserve={() => handleOpenModal(gift)}
+                onReserve={() => handleViewDetails(gift)} // ← Agora abre detalhes primeiro
                 coupleNames={coupleNames}
               />
             ))}
@@ -347,16 +355,32 @@ const GiftList: React.FC<GiftListProps> = ({
       )}
 
       {/* Modal de reserva */}
+      {/* Modais */}
       {selectedGift && (
-        <ReservationModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setSelectedGift(null);
-          }}
-          onConfirm={handleConfirmReservation}
-          giftName={selectedGift.name}
-        />
+        <>
+          <ViewDetailsModal
+            isOpen={isDetailsModalOpen}
+            onClose={() => {
+              setDetailsModalOpen(false);
+              setSelectedGift(null);
+            }}
+            gift={selectedGift}
+            onReserve={() => {
+              setDetailsModalOpen(false);
+              setReservationModalOpen(true); // Abre o de reserva
+            }}
+          />
+
+          <ReservationModal
+            isOpen={isReservationModalOpen}
+            onClose={() => {
+              setReservationModalOpen(false);
+              setSelectedGift(null);
+            }}
+            onConfirm={handleConfirmReservation}
+            giftName={selectedGift.name}
+          />
+        </>
       )}
     </div>
   );
