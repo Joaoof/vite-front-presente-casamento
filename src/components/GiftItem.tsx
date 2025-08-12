@@ -11,6 +11,7 @@ interface GiftItemProps {
   onEdit: (updatedGift: GiftType) => void;
   onDelete: () => void;
   onReserve: () => void;
+  onViewDetails: () => void; // ✅ Nova prop
   coupleNames: string;
 }
 
@@ -20,6 +21,7 @@ const GiftItem: React.FC<GiftItemProps> = ({
   onEdit,
   onDelete,
   onReserve,
+  onViewDetails,
   coupleNames,
 }) => {
   const isReserved = gift.status === 'reserved';
@@ -52,7 +54,7 @@ const GiftItem: React.FC<GiftItemProps> = ({
             }`}
         >
           {gift.imageUrl ? (
-            <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain" />
+            <img src={gift.imageUrl} alt={gift.name} onClick={onViewDetails} className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Gift size={24} className="text-gray-300" />
