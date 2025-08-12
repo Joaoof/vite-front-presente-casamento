@@ -3,7 +3,7 @@ import { Gift as GiftType } from '../types';
 import { Heart, Edit, Trash2, Gift, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import EditGiftModal from './EditGiftModal'; // ajuste o caminho se necessário
+import EditGiftModal from './EditGiftModal';
 
 interface GiftItemProps {
   gift: GiftType;
@@ -11,7 +11,7 @@ interface GiftItemProps {
   onEdit: (updatedGift: GiftType) => void;
   onDelete: () => void;
   onReserve: () => void;
-  onViewDetails: () => void; // ✅ Nova prop
+  onViewDetails: () => void; // ✅ Certifique-se de que esta prop está sendo passada
   coupleNames: string;
 }
 
@@ -35,8 +35,7 @@ const GiftItem: React.FC<GiftItemProps> = ({
   return (
     <>
       <div
-        className={`bg-white rounded-lg shadow-sm p-3 sm:p-2 hover:shadow transition-all duration-200 relative ${isReserved ? 'ring-2 ring-green-200 bg-green-50/30' : ''
-          }`}
+        className={`bg-white rounded-lg shadow-sm p-3 sm:p-2 hover:shadow transition-all duration-200 relative ${isReserved ? 'ring-2 ring-green-200 bg-green-50/30' : ''}`}
       >
         {/* Badge de Reservado */}
         {isReserved && (
@@ -50,13 +49,17 @@ const GiftItem: React.FC<GiftItemProps> = ({
 
         {/* Imagem do Presente */}
         <div
-          className={`w-full aspect-square mb-2 overflow-hidden rounded-md bg-white relative ${isReserved ? 'opacity-75' : ''
-            }`}
+          className={`w-full aspect-square mb-2 overflow-hidden rounded-md bg-white relative ${isReserved ? 'opacity-75' : ''}`}
         >
           {gift.imageUrl ? (
-            <img src={gift.imageUrl} alt={gift.name} onClick={onViewDetails} className="w-full h-full object-contain" />
+            <img
+              src={gift.imageUrl}
+              alt={gift.name}
+              onClick={onViewDetails} // ✅ Clique na imagem abre detalhes
+              className="w-full h-full object-contain cursor-pointer transition-transform duration-300 hover:scale-105"
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center cursor-pointer" onClick={onViewDetails}>
               <Gift size={24} className="text-gray-300" />
             </div>
           )}
@@ -64,17 +67,13 @@ const GiftItem: React.FC<GiftItemProps> = ({
 
         {/* Nome do Presente */}
         <h3
-          className={`text-xs sm:text-[13px] font-medium mb-1 line-clamp-2 min-h-[2.5em] ${isReserved ? 'text-gray-600' : 'text-gray-800'
-            }`}
+          className={`text-xs sm:text-[13px] font-medium mb-1 line-clamp-2 min-h-[2.5em] ${isReserved ? 'text-gray-600' : 'text-gray-800'}`}
         >
           {gift.name}
         </h3>
 
         {/* Preço */}
-        <p
-          className={`text-sm font-medium mb-2 ${isReserved ? 'text-gray-500' : 'text-gray-900'
-            }`}
-        >
+        <p className={`text-sm font-medium mb-2 ${isReserved ? 'text-gray-500' : 'text-gray-900'}`}>
           R$ {gift.price?.toFixed(2).replace('.', ',')}
         </p>
 
@@ -95,10 +94,20 @@ const GiftItem: React.FC<GiftItemProps> = ({
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
-          <button className="bg-white text-gray-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-            <Eye size={14} />
-            Ver detalhes
+        {/* Overlay com botão "Ver detalhes" */}
+        <div
+          className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer"
+          onClick={onViewDetails} // ✅ Clique no overlay abre detalhes
+          style={{ pointerEvents: 'auto' }}
+        >
+          <button
+            className="bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            onClick={(e) => {
+              e.stopPropagation(); // Evita duplo clique
+              onViewDetails();
+            }}
+          >
+            <Eye size={16} /> Ver detalhes
           </button>
         </div>
 
