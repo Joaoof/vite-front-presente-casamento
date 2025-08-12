@@ -33,29 +33,20 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
 
     return (
         <>
-            {/* Backdrop com animação */}
-            <div
-                className={`fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"
-                    }`}
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-sm" onClick={onClose} />
 
-            {/* Modal com animação de escala - Ajustado para melhor responsividade */}
-            <div
-                className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 transition-all duration-300 transform ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                    }`}
-            >
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                 <div
-                    className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col mt-4 sm:mt-0"
+                    className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-8 max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* Cabeçalho com ícone e título */}
-                    <div className="flex items-center justify-between border-b border-gray-200 px-4 sm:px-6 py-4 sm:py-5 sticky top-0 bg-white z-10">
+                    {/* Cabeçalho fixo */}
+                    <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-blue-100 rounded-full">
                                 <ExternalLink className="text-blue-600" size={20} />
                             </div>
-                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">Detalhes do Presente</h3>
+                            <h3 className="text-xl font-semibold text-gray-800">Detalhes do Presente</h3>
                         </div>
                         <button
                             onClick={onClose}
@@ -66,11 +57,11 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                         </button>
                     </div>
 
-                    {/* Corpo com scroll interno - Melhorado layout para telas maiores */}
-                    <div className="flex-1 px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5">
+                    {/* Corpo com scroll interno */}
+                    <div className="flex-1 px-6 py-5 space-y-5 overflow-y-auto">
                         {/* Imagem do presente */}
                         {gift.imageUrl ? (
-                            <div className="w-full h-48 sm:h-60 md:h-72 rounded-lg overflow-hidden mb-4">
+                            <div className="w-full h-72 rounded-lg overflow-hidden">
                                 <img
                                     src={gift.imageUrl || "/placeholder.svg"}
                                     alt={gift.name}
@@ -78,13 +69,13 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                                 />
                             </div>
                         ) : (
-                            <div className="w-full h-48 sm:h-60 md:h-72 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 border border-dashed">
+                            <div className="w-full h-72 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 border border-dashed">
                                 <span className="text-sm">Imagem não disponível</span>
                             </div>
                         )}
 
-                        {/* Informações em grid para telas maiores */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        {/* Informações em grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {/* Nome */}
                             <div className="md:col-span-2">
                                 <label className="text-sm font-medium text-gray-600">Nome do Presente</label>
@@ -102,7 +93,7 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                             {/* Preço */}
                             <div>
                                 <label className="text-sm font-medium text-gray-600">Valor Sugerido</label>
-                                <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">
+                                <p className="text-2xl font-bold text-blue-600 mt-1">
                                     {gift.price.toLocaleString("pt-BR", {
                                         style: "currency",
                                         currency: "BRL",
@@ -154,18 +145,18 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                         </div>
                     </div>
 
-                    {/* Rodapé com ações - Melhorado para mobile */}
-                    <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-6 py-4 border-t bg-gray-50 rounded-b-xl sticky bottom-0">
+                    {/* Rodapé fixo */}
+                    <div className="flex gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-xl">
                         <button
                             onClick={onClose}
-                            className="py-3 px-6 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors flex-1 order-2 sm:order-1"
+                            className="py-3 px-6 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors flex-1"
                         >
                             Fechar
                         </button>
                         {!gift.status && (
                             <button
                                 onClick={onReserve}
-                                className="py-3 px-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex-1 order-1 sm:order-2"
+                                className="py-3 px-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex-1"
                             >
                                 ✅ Reservar este presente
                             </button>
