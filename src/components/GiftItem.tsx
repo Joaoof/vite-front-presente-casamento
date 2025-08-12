@@ -1,6 +1,6 @@
 import React from 'react';
 import { Gift as GiftType } from '../types';
-import { Heart, Edit, Trash2, Gift } from 'lucide-react';
+import { Heart, Edit, Trash2, Gift, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditGiftModal from './EditGiftModal'; // ajuste o caminho se necessário
@@ -94,6 +94,13 @@ const GiftItem: React.FC<GiftItemProps> = ({
             ✓ Reservado
           </div>
         )}
+
+        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+          <button className="bg-white text-gray-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+            <Eye size={14} />
+            Ver detalhes
+          </button>
+        </div>
 
         {/* Botões Admin */}
         {isAdmin && (
