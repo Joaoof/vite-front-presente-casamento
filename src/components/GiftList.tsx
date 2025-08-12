@@ -3,7 +3,7 @@ import { Gift } from '../types';
 import GiftItem from './GiftItem';
 import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react';
 import ReservationModal from './ReservationModal';
-import ViewDetailsModal from './ViewDetailsModal'; // ✅ Adicione esta linha
+import ViewDetailsModal from './ViewDetailsModal';
 
 interface GiftListProps {
   isAdmin: boolean;
@@ -34,7 +34,7 @@ const GiftList: React.FC<GiftListProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isDetailsModalOpen, setDetailsModalOpen] = useState(false); // ✅ Abre detalhes
+  const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -64,7 +64,7 @@ const GiftList: React.FC<GiftListProps> = ({
 
       setGifts(data);
       setHasError(false);
-      setCurrentPage(1); // Reset da página ao recarregar
+      setCurrentPage(1);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       if (!hasError) {
@@ -76,12 +76,10 @@ const GiftList: React.FC<GiftListProps> = ({
     }
   };
 
-  // Recarrega quando o filtro muda
   useEffect(() => {
     fetchGifts();
   }, [filter]);
 
-  // Filtragem com case-insensitive já garantida
   const filteredGifts = useMemo(() => {
     return gifts
       .filter((gift) => {
@@ -108,7 +106,6 @@ const GiftList: React.FC<GiftListProps> = ({
     setModalOpen(true);
   };
 
-  // ✅ Abre o modal de detalhes ao clicar na imagem
   const handleViewDetails = (gift: Gift) => {
     setSelectedGift(gift);
     setDetailsModalOpen(true);
@@ -154,7 +151,7 @@ const GiftList: React.FC<GiftListProps> = ({
       } finally {
         setModalOpen(false);
         setSelectedGift(null);
-        fetchGifts(); // Atualiza lista após reserva
+        fetchGifts();
       }
     }
   };
@@ -247,11 +244,12 @@ const GiftList: React.FC<GiftListProps> = ({
   };
 
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto px-4">
+    //  Removido max-w-5xl e ajustado padding para melhor uso do espaço
+    <div className="animate-fade-in w-full px-3 sm:px-6 lg:px-8">
       {/* Título e imagem */}
       <div className="text-center mb-1">
         <img
-          src="https://i.postimg.cc/s24p309j/Noivos-em-Silhueta-e-Flores.png" // ✅ URL corrigida (sem espaço no final)
+          src="https://i.postimg.cc/s24p309j/Noivos-em-Silhueta-e-Flores.png"
           alt="Noivos em silhueta decorativa"
           className="w-44 mx-auto mb-6 opacity-80"
         />
@@ -266,7 +264,7 @@ const GiftList: React.FC<GiftListProps> = ({
       </div>
 
       {/* Botão de instrução e filtro de ordenação */}
-      <div className="flex items-center justify-between gap-5 mb-6">
+      <div className="flex items-center justify-between gap-5 mb-6 max-w-4xl mx-auto">
         <button className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded text-gray-600 hover:bg-gray-100 transition-colors">
           <PresentationIcon size={16} />
           <span className="text-xs">Reserve seu presente</span>
@@ -334,8 +332,8 @@ const GiftList: React.FC<GiftListProps> = ({
         </div>
       ) : (
         <>
-          {/* Grid de presentes */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-3 sm:gap-4">
+          {/* Grid de presentes -  Melhorado para usar mais espaço em telas grandes */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 max-w-none">
             {paginatedGifts.map((gift) => (
               <GiftItem
                 key={gift.id}
@@ -344,7 +342,7 @@ const GiftList: React.FC<GiftListProps> = ({
                 onEdit={() => onEditGift(gift)}
                 onDelete={() => onDeleteGift(gift.id)}
                 onReserve={() => handleOpenModal(gift)}
-                onViewDetails={() => handleViewDetails(gift)} // ✅ Adicione esta linha
+                onViewDetails={() => handleViewDetails(gift)}
                 coupleNames={coupleNames}
               />
             ))}
@@ -378,22 +376,9 @@ const GiftList: React.FC<GiftListProps> = ({
           }}
           onReserve={() => {
             setDetailsModalOpen(false);
-            setModalOpen(true); // Abre o modal de reserva
+            setModalOpen(true);
           }}
           gift={selectedGift as any}
-        />
-      )},
-
-      {/* Modal de reserva */}
-      {selectedGift && (
-        <ReservationModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setSelectedGift(null);
-          }}
-          onConfirm={handleConfirmReservation}
-          giftName={selectedGift.name}
         />
       )}
     </div>
