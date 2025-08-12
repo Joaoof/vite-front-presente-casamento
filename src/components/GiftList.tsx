@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Gift } from '../types';
 import GiftItem from './GiftItem';
-import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react'; // ✅ Adicionado Search
+import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react';
 import ReservationModal from './ReservationModal';
 
 interface GiftListProps {
@@ -74,6 +74,7 @@ const GiftList: React.FC<GiftListProps> = ({
     }
   };
 
+  // Recarrega quando o filtro muda
   useEffect(() => {
     fetchGifts();
   }, [filter]);
@@ -238,16 +239,25 @@ const GiftList: React.FC<GiftListProps> = ({
   };
 
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto px-1">
+    <div className="animate-fade-in max-w-5xl mx-auto px-4">
+      {/* Título e imagem */}
       <div className="text-center mb-1">
         <img
-          src="https://i.postimg.cc/s24p309j/Noivos-em-Silhueta-e-Flores.png"
-          alt="Decorative branch"
+          src="https://i.postimg.cc/s24p309j/Noivos-em-Silhueta-e-Flores.png" // ✅ URL corrigida (sem espaço no final)
+          alt="Noivos em silhueta decorativa"
           className="w-44 mx-auto mb-6 opacity-80"
         />
         <h2 className="m-6 text-xl font-serif text-[#9A7B6F]">LISTA DE PRESENTES</h2>
       </div>
 
+      {/* Aviso importante sobre preços */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6 max-w-md mx-auto">
+        <p className="text-xs text-amber-800 text-center leading-relaxed">
+          <strong>Atenção:</strong> Preços sujeitos a alteração. Os valores indicados são válidos para pagamento à vista (débito).
+        </p>
+      </div>
+
+      {/* Botão de instrução e filtro de ordenação */}
       <div className="flex items-center justify-between gap-5 mb-6">
         <button className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded text-gray-600 hover:bg-gray-100 transition-colors">
           <PresentationIcon size={16} />
@@ -270,7 +280,7 @@ const GiftList: React.FC<GiftListProps> = ({
         </div>
       </div>
 
-      {/* 🔍 Campo de pesquisa com lupa */}
+      {/* Campo de pesquisa com lupa */}
       <div className="mb-6">
         <div className="relative max-w-md mx-auto">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 pointer-events-none" />
@@ -296,6 +306,7 @@ const GiftList: React.FC<GiftListProps> = ({
         </div>
       )}
 
+      {/* Carregamento */}
       {isLoading ? (
         <div className="text-center py-8">
           <p className="text-gray-500">Carregando...</p>
@@ -315,6 +326,7 @@ const GiftList: React.FC<GiftListProps> = ({
         </div>
       ) : (
         <>
+          {/* Grid de presentes */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-3 sm:gap-4">
             {paginatedGifts.map((gift) => (
               <GiftItem
@@ -328,6 +340,8 @@ const GiftList: React.FC<GiftListProps> = ({
               />
             ))}
           </div>
+
+          {/* Paginação */}
           {renderPagination()}
         </>
       )}
