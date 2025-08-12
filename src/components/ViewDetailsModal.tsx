@@ -44,7 +44,7 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                     }`}
             >
                 <div
-                    className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col"
+                    className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col"
                     onClick={(e) => e.stopPropagation()} // Evita fechar ao clicar dentro
                 >
                     {/* Cabeçalho com ícone e título */}
@@ -65,14 +65,14 @@ const ViewDetailsModal: React.FC<ViewDetailsModalProps> = ({ isOpen, onClose, on
                     </div>
 
                     {/* Corpo com scroll interno */}
-                    <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+                    <div className="flex-1 px-6 py-5 space-y-5">
                         {/* Imagem do presente */}
                         {gift.imageUrl ? (
-                            <div className="rounded-lg overflow-hidden shadow-md">
+                            <div className="w-full h-60 rounded-lg overflow-hidden mb-4">
                                 <img
                                     src={gift.imageUrl}
                                     alt={gift.name}
-                                    className="w-full h-60 object-cover transition-transform duration-500 hover:scale-105"
+                                    className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
                                 />
                             </div>
                         ) : (
