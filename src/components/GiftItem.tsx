@@ -93,24 +93,7 @@ const GiftItem: React.FC<GiftItemProps> = ({
             ✓ Reservado
           </div>
         )}
-
-        {/* Overlay com botão "Ver detalhes" */}
-        <div
-          className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer"
-          onClick={onViewDetails} // ✅ Clique no overlay abre detalhes
-          style={{ pointerEvents: 'auto' }}
-        >
-          <button
-            className="bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-            onClick={(e) => {
-              e.stopPropagation(); // Evita duplo clique
-              onViewDetails();
-            }}
-          >
-            <Eye size={16} /> Ver detalhes
-          </button>
-        </div>
-
+        
         {/* Botões Admin */}
         {isAdmin && (
           <div className="flex gap-2 mt-3">
