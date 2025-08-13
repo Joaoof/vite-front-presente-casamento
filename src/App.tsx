@@ -18,7 +18,7 @@ import OurStory from './components/OurStory';
 function App() {
   // App configuration
   const coupleNames = 'João Victor & Ana Luiza';
-  const weddingDate = 'Data do Casamento: 20/01/2024';
+  const weddingDate = 'Data do Casamento: 04/10/2025';
 
   // Authentication
   const { isAuthenticated, logout } = useAuth();
