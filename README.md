@@ -1,46 +1,45 @@
 # Frontend: Lista de Presentes de Casamento
 
-\<p align="center"\>
-\<a href="[https://reactjs.org/](https://reactjs.org/)" target="\_blank"\>
-\<img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png)" width="120" alt="React Logo" /\>
-\</a\>
-\<a href="[https://vitejs.dev/](https://vitejs.dev/)" target="\_blank"\>
-\<img src="[https://vitejs.dev/logo.svg](https://www.google.com/search?q=https://vitejs.dev/logo.svg)" width="120" alt="Vite Logo" /\>
-\</a\>
-\</p\>
+Frontend: Lista de Presentes de Casamento
+<p align="center">
+<a href="https://reactjs.org/" target="_blank">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" width="120" alt="React Logo" />
+</a>
+<a href="https://vitejs.dev/" target="_blank">
+<img src="https://vitejs.dev/logo.svg" width="120" alt="Vite Logo" />
+</a>
+</p>
 
-\<p align="center"\>
-Uma aplicação frontend moderna e responsiva, construída com \<strong\>React\</strong\>, \<strong\>Vite\</strong\>, \<strong\>TypeScript\</strong\> e \<strong\>Tailwind CSS\</strong\>, projetada para ser rápida e escalável.
-\</p\>
+<p align="center">
+Uma aplicação frontend moderna e responsiva, construída com <strong>React</strong>, <strong>Vite</strong>, <strong>TypeScript</strong> e <strong>Tailwind CSS</strong>, projetada para ser rápida e escalável.
+</p>
 
-\<p align="center"\>
-\<a href="[https://npmjs.com/package/react](https://npmjs.com/package/react)" target="\_blank"\>
-\<img src="[https://img.shields.io/npm/v/react.svg](https://img.shields.io/npm/v/react.svg)" alt="Versão do React" /\>
-\</a\>
-\<a href="[https://npmjs.com/package/react-dom](https://npmjs.com/package/react-dom)" target="\_blank"\>
-\<img src="[https://img.shields.io/npm/v/react-dom.svg](https://img.shields.io/npm/v/react-dom.svg)" alt="Versão do React DOM" /\>
-\</a\>
-\<a href="[https://github.com/vitejs/vite](https://github.com/vitejs/vite)" target="\_blank"\>
-\<img src="[https://img.shields.io/badge/Vite-4.5.0-blue.svg](https://img.shields.io/badge/Vite-4.5.0-blue.svg)" alt="Versão do Vite" /\>
-\</a\>
-\<a href="[https://tailwindcss.com/](https://tailwindcss.com/)" target="\_blank"\>
-\<img src="[https://img.shields.io/badge/Tailwind\_CSS-3.4.0-blue.svg](https://img.shields.io/badge/Tailwind_CSS-3.4.0-blue.svg)" alt="Tailwind CSS" /\>
-\</a\>
-\<a href="[https://typescriptlang.org/](https://typescriptlang.org/)" target="\_blank"\>
-\<img src="[https://img.shields.io/badge/TypeScript-5.0.0-blue.svg](https://img.shields.io/badge/TypeScript-5.0.0-blue.svg)" alt="TypeScript" /\>
-\</a\>
-\<a href="[https://eslint.org/](https://eslint.org/)" target="\_blank"\>
-\<img src="[https://img.shields.io/badge/ESLint-8.54.0-green.svg](https://img.shields.io/badge/ESLint-8.54.0-green.svg)" alt="ESLint" /\>
-\</a\>
-\<a href="[https://discord.gg/react](https://discord.gg/react)" target="\_blank"\>
-\<img src="[https://img.shields.io/badge/discord-online-brightgreen.svg](https://img.shields.io/badge/discord-online-brightgreen.svg)" alt="Discord" /\>
-\</a\>
-\<a href="[https://twitter.com/reactjs](https://twitter.com/reactjs)" target="\_blank"\>
-\<img src="[https://img.shields.io/twitter/follow/reactjs.svg?style=social\&label=Follow](https://img.shields.io/twitter/follow/reactjs.svg?style=social&label=Follow)" alt="Siga no Twitter" /\>
-\</a\>
-\</p\>
-
------
+<p align="center">
+<a href="https://npmjs.com/package/react" target="_blank">
+<img src="https://img.shields.io/npm/v/react.svg" alt="Versão do React" />
+</a>
+<a href="https://npmjs.com/package/react-dom" target="_blank">
+<img src="https://img.shields.io/npm/v/react-dom.svg" alt="Versão do React DOM" />
+</a>
+<a href="https://github.com/vitejs/vite" target="_blank">
+<img src="https://img.shields.io/badge/Vite-4.5.0-blue.svg" alt="Versão do Vite" />
+</a>
+<a href="https://tailwindcss.com/" target="_blank">
+<img src="https://img.shields.io/badge/Tailwind_CSS-3.4.0-blue.svg" alt="Tailwind CSS" />
+</a>
+<a href="https://typescriptlang.org/" target="_blank">
+<img src="https://img.shields.io/badge/TypeScript-5.0.0-blue.svg" alt="TypeScript" />
+</a>
+<a href="https://eslint.org/" target="_blank">
+<img src="https://img.shields.io/badge/ESLint-8.54.0-green.svg" alt="ESLint" />
+</a>
+<a href="https://discord.gg/react" target="_blank">
+<img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord" />
+</a>
+<a href="https://twitter.com/reactjs" target="_blank">
+<img src="https://img.shields.io/twitter/follow/reactjs.svg?style=social&label=Follow" alt="Siga no Twitter" />
+</a>
+</p>
 
 ## 🚀 Visão Geral do Projeto
 
