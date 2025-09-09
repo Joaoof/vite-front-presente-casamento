@@ -84,9 +84,13 @@ const GiftList: React.FC<GiftListProps> = ({
   const filteredGifts = useMemo(() => {
     return gifts
       .filter((gift) => {
-        if (filter === 'available' && gift.status) return false;
-        if (filter === 'reserved' && !gift.status) return false;
-        return true;
+        if (filter === 'available') {
+          return !gift.status; // status false ou undefined = disponível
+        }
+        if (filter === 'reserved') {
+          return gift.status === 'reserved'; // só os verdadeiramente reservados
+        }
+        return true; // 'all' — mostra tudo
       })
       .filter((gift) =>
         gift.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
@@ -274,10 +278,7 @@ const GiftList: React.FC<GiftListProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-600">Ordenar lista por:</span>
           <select
-            className="bg-transparent text-xs text-gray-800 focus:outline-none cursor-pointer"
-            onChange={(e) =>
-              onFilterChange(e.target.value as 'all' | 'available' | 'reserved')
-            }
+            onChange={(e) => onFilterChange(e.target.value as 'all' | 'available' | 'reserved')}
             value={filter}
           >
             <option value="all">A-Z</option>
