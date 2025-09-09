@@ -106,7 +106,6 @@ A aplicação usa variáveis de ambiente. Crie um arquivo `.env` na raiz do proj
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api
-VITE_WHATSAPP_NUMBER=+5511999999999
 ```
 
 > **Atenção:** Certifique-se de substituir `VITE_API_BASE_URL` pelo URL da sua API de backend.
@@ -153,6 +152,6 @@ Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](
 
 **Joaoof** – Desenvolvedor Frontend
 [Perfil no GitHub](https://github.com/Joaoof)
-📧 Contato: joao@example.com
+📧 Contato: joaodeus400@gmail.com
 
 > ✨ Construído com ❤️ usando React, Vite, e Tailwind CSS.
