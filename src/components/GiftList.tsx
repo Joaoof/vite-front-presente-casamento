@@ -281,7 +281,7 @@ const GiftList: React.FC<GiftListProps> = ({
             onChange={(e) => onFilterChange(e.target.value as 'all' | 'available' | 'reserved')}
             value={filter}
           >
-            <option value="all">A-Z</option>
+            <option value="all">Todos os presentes</option>
             <option value="available">Disponíveis</option>
             <option value="reserved">Reservados</option>
           </select>
