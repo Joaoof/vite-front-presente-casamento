@@ -164,7 +164,6 @@ const GiftList: React.FC<GiftListProps> = ({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const renderPagination = () => {
