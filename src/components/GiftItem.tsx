@@ -11,7 +11,6 @@ interface GiftItemProps {
   onEdit: (updatedGift: GiftType) => void;
   onDelete: () => void;
   onReserve: () => void;
-  onViewDetails: () => void; // ✅ Certifique-se de que esta prop está sendo passada
   coupleNames: string;
 }
 
@@ -21,7 +20,6 @@ const GiftItem: React.FC<GiftItemProps> = ({
   onEdit,
   onDelete,
   onReserve,
-  onViewDetails,
   coupleNames,
 }) => {
   const isReserved = gift.status === 'reserved';
@@ -55,13 +53,10 @@ const GiftItem: React.FC<GiftItemProps> = ({
             <img
               src={gift.imageUrl}
               alt={gift.name}
-              onClick={onViewDetails} // ✅ Clique na imagem abre detalhes
               className="w-full h-full object-contain cursor-pointer transition-transform duration-300 hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center cursor-pointer" onClick={onViewDetails}>
-              <Gift size={24} className="text-gray-300" />
-            </div>
+            <Gift size={24} className="text-gray-300" />
           )}
         </div>
 
@@ -93,7 +88,7 @@ const GiftItem: React.FC<GiftItemProps> = ({
             ✓ Reservado
           </div>
         )}
-        
+
         {/* Botões Admin */}
         {isAdmin && (
           <div className="flex gap-2 mt-3">

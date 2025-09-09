@@ -3,7 +3,6 @@ import { Gift } from '../types';
 import GiftItem from './GiftItem';
 import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react';
 import ReservationModal from './ReservationModal';
-import ViewDetailsModal from './ViewDetailsModal'; // ✅ Adicione esta linha
 
 interface GiftListProps {
   isAdmin: boolean;
@@ -344,7 +343,6 @@ const GiftList: React.FC<GiftListProps> = ({
                 onEdit={() => onEditGift(gift)}
                 onDelete={() => onDeleteGift(gift.id)}
                 onReserve={() => handleOpenModal(gift)}
-                onViewDetails={() => handleViewDetails(gift)} // ✅ Adicione esta linha
                 coupleNames={coupleNames}
               />
             ))}
@@ -369,20 +367,6 @@ const GiftList: React.FC<GiftListProps> = ({
       )}
 
       {/* Modal de detalhes do presente */}
-      {selectedGift && (
-        <ViewDetailsModal
-          isOpen={isDetailsModalOpen}
-          onClose={() => {
-            setDetailsModalOpen(false);
-            setSelectedGift(null);
-          }}
-          onReserve={() => {
-            setDetailsModalOpen(false);
-            setModalOpen(true); // Abre o modal de reserva
-          }}
-          gift={selectedGift as any}
-        />
-      )},
 
       {/* Modal de reserva */}
       {selectedGift && (
