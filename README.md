@@ -1,275 +1,160 @@
-Perfeito! Com base na estrutura do seu **frontend (React + Vite + TypeScript)**, vou gerar um `README.md` profissional, claro e bem organizado, que reflita exatamente o que você tem no projeto.
+# Frontend: Lista de Presentes de Casamento
 
----
+\<p align="center"\>
+\<a href="[https://reactjs.org/](https://reactjs.org/)" target="\_blank"\>
+\<img src="[https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png)" width="120" alt="React Logo" /\>
+\</a\>
+\<a href="[https://vitejs.dev/](https://vitejs.dev/)" target="\_blank"\>
+\<img src="[https://vitejs.dev/logo.svg](https://www.google.com/search?q=https://vitejs.dev/logo.svg)" width="120" alt="Vite Logo" /\>
+\</a\>
+\</p\>
 
-### ✅ Informações extraídas da imagem:
-- Framework: **React com Vite**
-- Linguagem: **TypeScript**
-- Estilização: **Tailwind CSS**
-- Estrutura de pastas:
-  - `components/`: componentes reutilizáveis
-  - `context/`: contexto de autenticação (`AuthContext`)
-  - `data/`: dados estáticos (ex: produtos)
-  - `hooks/`: hooks personalizados (`useAuth`, `useGifts`)
-  - `services/`: serviços para API, armazenamento e WhatsApp
-  - `ui/`: elementos UI genéricos (botões, inputs, etc.)
-  - `types/`: tipos em TypeScript
-  - `public/images/`: imagens usadas no site
+\<p align="center"\>
+Uma aplicação frontend moderna e responsiva, construída com \<strong\>React\</strong\>, \<strong\>Vite\</strong\>, \<strong\>TypeScript\</strong\> e \<strong\>Tailwind CSS\</strong\>, projetada para ser rápida e escalável.
+\</p\>
 
----
+\<p align="center"\>
+\<a href="[https://npmjs.com/package/react](https://npmjs.com/package/react)" target="\_blank"\>
+\<img src="[https://img.shields.io/npm/v/react.svg](https://img.shields.io/npm/v/react.svg)" alt="Versão do React" /\>
+\</a\>
+\<a href="[https://npmjs.com/package/react-dom](https://npmjs.com/package/react-dom)" target="\_blank"\>
+\<img src="[https://img.shields.io/npm/v/react-dom.svg](https://img.shields.io/npm/v/react-dom.svg)" alt="Versão do React DOM" /\>
+\</a\>
+\<a href="[https://github.com/vitejs/vite](https://github.com/vitejs/vite)" target="\_blank"\>
+\<img src="[https://img.shields.io/badge/Vite-4.5.0-blue.svg](https://img.shields.io/badge/Vite-4.5.0-blue.svg)" alt="Versão do Vite" /\>
+\</a\>
+\<a href="[https://tailwindcss.com/](https://tailwindcss.com/)" target="\_blank"\>
+\<img src="[https://img.shields.io/badge/Tailwind\_CSS-3.4.0-blue.svg](https://img.shields.io/badge/Tailwind_CSS-3.4.0-blue.svg)" alt="Tailwind CSS" /\>
+\</a\>
+\<a href="[https://typescriptlang.org/](https://typescriptlang.org/)" target="\_blank"\>
+\<img src="[https://img.shields.io/badge/TypeScript-5.0.0-blue.svg](https://img.shields.io/badge/TypeScript-5.0.0-blue.svg)" alt="TypeScript" /\>
+\</a\>
+\<a href="[https://eslint.org/](https://eslint.org/)" target="\_blank"\>
+\<img src="[https://img.shields.io/badge/ESLint-8.54.0-green.svg](https://img.shields.io/badge/ESLint-8.54.0-green.svg)" alt="ESLint" /\>
+\</a\>
+\<a href="[https://discord.gg/react](https://discord.gg/react)" target="\_blank"\>
+\<img src="[https://img.shields.io/badge/discord-online-brightgreen.svg](https://img.shields.io/badge/discord-online-brightgreen.svg)" alt="Discord" /\>
+\</a\>
+\<a href="[https://twitter.com/reactjs](https://twitter.com/reactjs)" target="\_blank"\>
+\<img src="[https://img.shields.io/twitter/follow/reactjs.svg?style=social\&label=Follow](https://img.shields.io/twitter/follow/reactjs.svg?style=social&label=Follow)" alt="Siga no Twitter" /\>
+\</a\>
+\</p\>
 
-Aqui está o **`README.md` completo e pronto para usar**:
+-----
 
-```markdown
-<p align="center">
-  <a href="https://reactjs.org/" target="_blank">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" width="120" alt="React Logo" />
-  </a>
-</p>
+## 🚀 Visão Geral do Projeto
 
-<p align="center">
-  A modern React application built with <a href="https://vitejs.dev/" target="_blank">Vite</a>, <a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a>, and <a href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a> for a fast, scalable, and responsive frontend.
-</p>
+Este é o **frontend** de uma plataforma de lista de presentes para casamento. A aplicação oferece uma interface amigável para navegação, reserva de presentes e gerenciamento de autenticação de usuários.
 
-<p align="center">
-  <a href="https://npmjs.com/package/react" target="_blank">
-    <img src="https://img.shields.io/npm/v/react.svg" alt="React Version" />
-  </a>
-  <a href="https://npmjs.com/package/react-dom" target="_blank">
-    <img src="https://img.shields.io/npm/v/react-dom.svg" alt="React DOM Version" />
-  </a>
-  <a href="https://github.com/vitejs/vite" target="_blank">
-    <img src="https://img.shields.io/badge/Vite-4.5.0-blue.svg" alt="Vite Version" />
-  </a>
-  <a href="https://tailwindcss.com/" target="_blank">
-    <img src="https://img.shields.io/badge/Tailwind_CSS-3.4.0-blue.svg" alt="Tailwind CSS" />
-  </a>
-  <a href="https://typescriptlang.org/" target="_blank">
-    <img src="https://img.shields.io/badge/TypeScript-5.0.0-blue.svg" alt="TypeScript" />
-  </a>
-  <a href="https://eslint.org/" target="_blank">
-    <img src="https://img.shields.io/badge/ESLint-8.54.0-green.svg" alt="ESLint" />
-  </a>
-  <a href="https://discord.gg/react" target="_blank">
-    <img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord" />
-  </a>
-  <a href="https://twitter.com/reactjs" target="_blank">
-    <img src="https://img.shields.io/twitter/follow/reactjs.svg?style=social&label=Follow" alt="Follow on Twitter" />
-  </a>
-</p>
+A aplicação utiliza **Tailwind CSS** para estilização, **hooks personalizados** do React para gestão de estado, e uma estrutura modular e limpa para garantir escalabilidade e fácil manutenção.
 
----
+-----
 
-## 🚀 Project Overview
-
-This is the **frontend application** for a gift reservation platform, built with **React**, **Vite**, and **TypeScript**. It provides a user-friendly interface for browsing gifts, making reservations, and managing user authentication.
-
-The app uses **Tailwind CSS** for styling, custom **React hooks** for state management, and a clean modular structure to ensure scalability and maintainability.
-
----
-
-## 📁 Project Structure
+## 📁 Estrutura do Projeto
 
 ```
 src/
-├── components/           # Reusable UI components
-│   ├── AdminPanel.tsx
-│   ├── EditGiftModal.tsx
-│   ├── Footer.tsx
-│   ├── GiftRegistrationForm.tsx
-│   ├── GiftForm.tsx
-│   ├── GiftItem.tsx
-│   ├── GiftList.tsx
-│   ├── Header.tsx
-│   ├── LoginModal.tsx
-│   ├── OurStory.tsx
-│   ├── PhotosCarousel.tsx
-│   ├── ReservationModal.tsx
-│   ├── Toast.tsx
-│   └── ViewDetailsModal.tsx
-│
-├── context/              # React Context for global state
-│   └── AuthContext.tsx
-│
-├── data/                 # Static data (e.g., products)
-│   └── products.ts
-│
-├── helpers/              # Utility functions
-│   └── export.helper.ts
-│
-├── hooks/                # Custom React hooks
-│   ├── useAuth.ts
-│   └── useGifts.ts
-│
-├── libs/                 # Shared utilities
-│   └── utils.ts
-│
-├── public/               # Public assets
-│   └── images/
-│       ├── iv-al.png
-│       └── padrao-presente.jpg
-│
-├── services/             # API and utility services
-│   ├── api.ts            # HTTP requests to backend
-│   ├── storage.ts        # Local storage handling
-│   └── whatsapp.ts       # WhatsApp integration
-│
-├── styles/               # Global styles and animations
-│   └── animations.css
-│
-├── types/                # TypeScript interfaces
-│   ├── Product.ts
-│   └── index.ts
-│
-├── ui/                   # Basic UI elements
-│   ├── Button.tsx
-│   ├── Dialog.tsx
-│   ├── Input.tsx
-│   └── Label.tsx
-│
-├── App.tsx               # Main app component
-├── main.tsx              # Entry point
-└── vite-env.d.ts         # Vite environment types
+├── components/         # Componentes de UI reutilizáveis
+├── context/            # Contexto do React para estado global (ex: autenticação)
+├── data/               # Dados estáticos (ex: lista de presentes)
+├── helpers/            # Funções utilitárias
+├── hooks/              # Hooks personalizados do React
+├── libs/               # Bibliotecas ou utilitários genéricos
+├── public/             # Arquivos públicos (imagens, ícones)
+├── services/           # Serviços de API, armazenamento e integrações
+├── styles/             # Estilos globais e animações
+├── types/              # Definições de tipos do TypeScript
+├── ui/                 # Elementos básicos de UI (botões, inputs)
+├── App.tsx             # Componente principal da aplicação
+├── main.tsx            # Ponto de entrada
+└── vite-env.d.ts       # Tipos de ambiente do Vite
 ```
 
----
+-----
 
-## 🛠️ Project Setup
+## 🛠️ Configuração e Instalação
 
 ```bash
-# Clone the repository
+# Clone o repositório
 git clone https://github.com/yourusername/your-repo.git
 
-# Navigate into the directory
+# Navegue até o diretório do projeto
 cd your-repo
 
-# Install dependencies
+# Instale as dependências
 npm install
 ```
 
----
+-----
 
-## 🚀 Running the Application
+## 🚀 Como Executar
 
 ```bash
-# Start development server (with hot reload)
+# Inicia o servidor de desenvolvimento (com hot reload)
 npm run dev
 
-# Build for production
+# Compila para produção
 npm run build
 
-# Preview production build
+# Pré-visualiza o build de produção
 npm run preview
 ```
 
----
+-----
 
-## 🧪 Testing
+## 🌐 Configuração de Ambiente
 
-Currently, this project does not include automated tests. However, you can add Jest or Vitest later using:
-
-```bash
-npm add --save-dev vitest @vitejs/plugin-vitest
-```
-
----
-
-## 🌐 Environment Configuration
-
-The app uses `.env` files for environment variables. Create a `.env` file in the root:
+A aplicação usa variáveis de ambiente. Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis, substituindo os valores de exemplo:
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api
 VITE_WHATSAPP_NUMBER=+5511999999999
 ```
 
-> Replace `VITE_API_BASE_URL` with your backend URL.
+> **Atenção:** Certifique-se de substituir `VITE_API_BASE_URL` pelo URL da sua API de backend.
 
----
+-----
 
-## 🎨 Styling & Design
+## 🎨 Estilização e Design
 
-- **Tailwind CSS** is used for utility-first styling.
-- Custom animations are defined in `styles/animations.css`.
-- Responsive design for mobile and desktop.
+  * **Tailwind CSS** é usado para um sistema de design "utility-first".
+  * A aplicação conta com um design responsivo, adaptando-se a dispositivos móveis e desktops.
 
----
+-----
 
-## 🔐 Authentication
+## 🔐 Autenticação
 
-- Uses `AuthContext` for managing login/logout states.
-- Token stored in `localStorage` via `storage.ts`.
-- Protected routes can be implemented using `useAuth`.
+  * A gestão de estado de autenticação é feita com o `AuthContext`.
+  * Tokens são armazenados de forma segura no `localStorage` pelo serviço `storage.ts`.
 
----
+-----
 
-## 📡 API Integration
+## 📡 Integração com a API
 
-All API calls are handled through `services/api.ts`. The service includes:
-- Base URL configuration
-- Request interceptors
-- Error handling
-- Axios-based HTTP client
+  * Todas as chamadas à API são gerenciadas pelo serviço `services/api.ts`.
+  * O serviço utiliza **Axios** e inclui configuração de URL base, interceptores de requisição e tratamento de erros.
 
----
+-----
 
-## 📱 WhatsApp Integration
+## 📚 Recursos Úteis
 
-- `services/whatsapp.ts` handles sending messages via WhatsApp.
-- Used for confirming reservations or customer support.
+  * [Documentação do React](https://react.dev/)
+  * [Documentação do Vite](https://vitejs.dev/)
+  * [Guia do Tailwind CSS](https://tailwindcss.com/docs)
+  * [Manual do TypeScript](https://www.typescriptlang.org/docs/)
 
----
+-----
 
-## 📚 Resources
+## 📄 Licença
 
-- [React Documentation](https://react.dev/)
-- [Vite Docs](https://vitejs.dev/)
-- [Tailwind CSS Guide](https://tailwindcss.com/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [React Hooks Guide](https://react.dev/learn)
+Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](https://www.google.com/search?q=LICENSE) para mais detalhes.
 
----
+-----
 
-## 💬 Support & Contact
+## 👤 Autor
 
-If you have questions or need help:
-- Join the [React Discord](https://discord.gg/react)
-- Follow [@reactjs](https://twitter.com/reactjs) on Twitter
-- Open an issue on GitHub
+**Joaoof** – Desenvolvedor Frontend
+[Perfil no GitHub](https://github.com/Joaoof)
+📧 Contato: joao@example.com
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👤 Author
-
-**Joaoof** – Frontend Developer  
-[GitHub Profile](https://github.com/Joaoof)  
-📧 Contact: joao@example.com (replace with your email)
-
----
-
-> ✨ Built with ❤️ using React, Vite, and Tailwind CSS
-```
-
----
-
-### ✅ O que foi incluído?
-
-- **Logo do React** e links oficiais
-- **Badges atualizados** com versões realistas (você pode ajustar se quiser)
-- **Estrutura de pastas detalhada** com descrições
-- **Explicação dos módulos principais**: context, hooks, services, UI
-- **Configuração de ambiente** com `VITE_`
-- **Integração WhatsApp** destacada
-- **Autenticação com Context**
-- **Links úteis** e documentação
-- **Formato limpo e profissional**
-
----
-
-Se quiser, posso gerar uma versão **em português** ou adaptar para **Next.js**, **Nuxt**, ou qualquer outro framework. Deseja isso?
+> ✨ Construído com ❤️ usando React, Vite, e Tailwind CSS.
