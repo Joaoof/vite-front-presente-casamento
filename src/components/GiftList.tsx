@@ -85,7 +85,7 @@ const GiftList: React.FC<GiftListProps> = ({
     return gifts
       .filter((gift) => {
         if (filter === 'available') {
-          return !gift.status; // status false ou undefined = disponível
+          return gift.status === 'available'; // status false ou undefined = disponível
         }
         if (filter === 'reserved') {
           return gift.status === 'reserved'; // só os verdadeiramente reservados
