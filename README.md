@@ -1,6 +1,5 @@
 # Frontend: Lista de Presentes de Casamento
 
-Frontend: Lista de Presentes de Casamento
 <p align="center">
 <a href="https://reactjs.org/" target="_blank">
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" width="120" alt="React Logo" />
