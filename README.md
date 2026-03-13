@@ -72,6 +72,13 @@ src/
 
 ## 🛠️ Configuração e Instalação
 
+> **Pré-requisito rápido:** tenha o **pnpm** disponível. Se necessário, ative via Corepack:
+>
+> ```bash
+> corepack enable
+> corepack prepare pnpm@latest --activate
+> ```
+
 ```bash
 # Clone o repositório
 git clone https://github.com/yourusername/your-repo.git
@@ -80,7 +87,7 @@ git clone https://github.com/yourusername/your-repo.git
 cd your-repo
 
 # Instale as dependências
-npm install
+pnpm install
 ```
 
 -----
@@ -89,26 +96,27 @@ npm install
 
 ```bash
 # Inicia o servidor de desenvolvimento (com hot reload)
-npm run dev
+pnpm dev
 
 # Compila para produção
-npm run build
+pnpm build
 
 # Pré-visualiza o build de produção
-npm run preview
+pnpm preview
 ```
 
 -----
 
 ## 🌐 Configuração de Ambiente
 
-A aplicação usa variáveis de ambiente. Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis, substituindo os valores de exemplo:
+A aplicação usa variáveis de ambiente. Crie um arquivo `.env` na raiz do projeto e adicione as variáveis abaixo (mantendo a mesma base de URL da API, sem alterar rotas/endpoints):
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_URL=http://localhost:3000
+# (opcional/compatibilidade) VITE_API_BASE_URL=http://localhost:3000/api
 ```
 
-> **Atenção:** Certifique-se de substituir `VITE_API_BASE_URL` pelo URL da sua API de backend.
+> **Atenção:** use como principal `VITE_API_URL` (ex.: `http://localhost:3000`) para preservar chamadas como `/gifts` e `/auth/login`. Se seu ambiente ainda usar `VITE_API_BASE_URL`, mantenha-o alinhado com a mesma API.
 
 -----
 
@@ -129,7 +137,7 @@ VITE_API_BASE_URL=http://localhost:3000/api
 ## 📡 Integração com a API
 
   * Todas as chamadas à API são gerenciadas pelo serviço `services/api.ts`.
-  * O serviço utiliza **Axios** e inclui configuração de URL base, interceptores de requisição e tratamento de erros.
+  * A integração mantém os mesmos caminhos de backend (como `/gifts`, `/gifts/:id`, `/gifts/:id/reserve` e `/auth/login`), sem mudanças de rotas/endpoints.
 
 -----
 
