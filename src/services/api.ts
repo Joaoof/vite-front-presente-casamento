@@ -2,15 +2,12 @@ import { Gift } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-console.log(API_URL);
-
 
 export const api = {
   async getGifts(): Promise<Gift[]> {
     const response = await fetch(`${API_URL}/gifts`, {
       method: 'GET',
     });
-    console.log(response);
 
     if (!response.ok) throw new Error('Falha ao buscar presentes');
     return response.json();
@@ -26,8 +23,6 @@ export const api = {
         },
         body: JSON.stringify(gift),
       });
-
-      console.log(response);
 
       if (!response.ok) throw new Error('Falha ao criar presente');
       return response.json();
@@ -47,11 +42,8 @@ export const api = {
       body: JSON.stringify({ reservedBy: guestName }),
     });
 
-    console.log('ESSE AQUI È MEU RESPONSE SEU BOBÂO', response);
-
-
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       throw new Error(error.message || 'Failed to reserve gift');
     }
 
@@ -68,6 +60,8 @@ export const api = {
         },
         body: JSON.stringify(updates),
       })
+
+      if (!response.ok) throw new Error('Falha ao atualizar presente');
       return response.json();
     } catch (error) {
       console.error('Erro ao atualizar presente:', error);
@@ -99,8 +93,6 @@ export const api = {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log(response);
-
       if (!response.ok) throw new Error('Credenciais inválidas');
       return response.json();
     } catch (error) {
@@ -115,9 +107,15 @@ export const api = {
     filter: 'all' | 'available' | 'reserved' = 'all',
     search: string = ''
   ): Promise<{ data: Gift[]; meta: any }> {
-    const response = await fetch(
-      `${API_URL}/gifts?page=${page}&limit=${limit}&filter=${filter}&search=${search}`
-    );
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      filter,
+      search,
+    });
+
+    const response = await fetch(`${API_URL}/gifts?${params.toString()}`);
+    if (!response.ok) throw new Error('Falha ao buscar presentes');
     return response.json();
   },
 };
