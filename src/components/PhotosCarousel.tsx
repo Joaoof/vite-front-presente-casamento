@@ -1,139 +1,168 @@
-import React from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { ChevronLeft, ChevronRight, Heart, Images } from 'lucide-react'
+import PhotoGallery from './PhotoGallery'  // ← novo import
 
 const photos = [
-    { url: 'https://i.postimg.cc/nVYZcBCh/imagem-2025-06-06-113246405.png' },
-    { url: 'https://i.postimg.cc/cC1zJKbv/15-E558-CC-EECD-41-D2-8034-041-DA5-A6-D362.png' },
-    { url: 'https://i.postimg.cc/rmNbcGQ6/6-EC86-FF5-0-E73-4081-9-C84-96230-F17338-C.png' },
-    { url: 'https://i.postimg.cc/nhMtkWTX/BCD4443-D-467-A-4-B9-E-817-D-684232-FBA78-E.png' },
-];
+  { url: '/img3.JPG',  caption: 'O começo de tudo'    },
+  { url: '/img4.JPG',  caption: 'Cada detalhe importa' },
+  { url: '/img5.JPG',  caption: 'Momentos eternos'     },
+  { url: '/img6.JPG',  caption: 'Nossa história'       },
+  { url: '/img7.JPG',  caption: 'Sempre juntos'        },
+  { url: '/img8.JPG',  caption: 'Amor verdadeiro'      },
+  { url: '/img9.JPG',  caption: 'Para sempre'          },
+  { url: '/img10.JPG', caption: 'Eternamente'          },
+  { url: '/img11.JPG', caption: 'Eternamente'          },
+  { url: '/img12.JPG', caption: 'Eternamente'          },
+  { url: '/img13.JPG', caption: 'Eternamente'          },
+  { url: '/img14.JPG', caption: 'Eternamente'          },
+  { url: '/img15.JPG', caption: 'Eternamente'          },
+  { url: '/img16.JPG', caption: 'Eternamente'          },
+].filter(p => p.url)
 
-const PhotoCarousel: React.FC = () => {
-    // Adicionado 'align: center' para melhor visualização
-    const [emblaRef, emblaApi] = useEmblaCarousel({
-        loop: true,
-        duration: 40, // Transição mais suave e lenta
-        align: 'center',
-    });
-    
-    const [selectedIndex, setSelectedIndex] = React.useState(0);
+export default function PhotoCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 35, align: 'center' })
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
+  const [isHovering, setIsHovering]       = React.useState(false)
+  const [showGallery, setShowGallery]     = React.useState(false)  // ← novo estado
 
-    const scrollPrev = React.useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-    const scrollNext = React.useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollPrev = React.useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
+  const scrollNext = React.useCallback(() => emblaApi?.scrollNext(), [emblaApi])
 
-    const onSelect = React.useCallback(() => {
-        if (!emblaApi) return;
-        setSelectedIndex(emblaApi.selectedScrollSnap());
-    }, [emblaApi]);
+  const onSelect = React.useCallback(() => {
+    if (!emblaApi) return
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+  }, [emblaApi])
 
-    React.useEffect(() => {
-        if (!emblaApi) return;
-        onSelect();
-        emblaApi.on('select', onSelect);
-        return () => {
-            emblaApi.off('select', onSelect);
-        };
-    }, [emblaApi, onSelect]);
+  React.useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+    emblaApi.on('select', onSelect)
+    return () => { emblaApi.off('select', onSelect) }
+  }, [emblaApi, onSelect])
 
-    // Autoplay refinado (pausa ao interagir)
-    React.useEffect(() => {
-        if (!emblaApi) return;
+  React.useEffect(() => {
+    if (!emblaApi || isHovering) return
+    const timer = setInterval(() => emblaApi.scrollNext(), 5000)
+    return () => clearInterval(timer)
+  }, [emblaApi, isHovering])
 
-        const autoplay = setInterval(() => {
-            if (emblaApi.internalEngine().dragHandler.pointerDown()) return; // Não rola se estiver arrastando
-            emblaApi.scrollNext();
-        }, 5000); // Mais tempo para apreciar a foto
+  return (
+    <>
+      <section
+        className="relative w-full overflow-hidden bg-[#fdf9f6] py-24 dark:bg-slate-900"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        {/* Fundo decorativo */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-rose-100/40 blur-3xl dark:bg-rose-900/10" />
+          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-rose-100/40 blur-3xl dark:bg-rose-900/10" />
+        </div>
 
-        return () => clearInterval(autoplay);
-    }, [emblaApi]);
+        {/* Título */}
+        <div className="relative mb-14 px-4 text-center">
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <div className="h-[1px] w-10 bg-rose-200" />
+            <Heart className="h-3.5 w-3.5 fill-rose-300 text-rose-300" />
+            <div className="h-[1px] w-10 bg-rose-200" />
+          </div>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.45em] text-rose-400">Galeria</p>
+          <h2 className="font-serif text-3xl font-bold text-slate-700 dark:text-white md:text-4xl">
+            Nossos Momentos
+          </h2>
+          <div className="mx-auto mt-3 h-[1px] w-14 bg-rose-200" />
+        </div>
 
-    return (
-        <section className="w-full bg-[#FAF8F5] py-20 overflow-hidden">
-            
-            {/* Título de Seção Elegante */}
-            <div className="text-center mb-16 px-4">
-                <h2 className="text-xs md:text-sm font-['Montserrat'] text-gray-400 tracking-[0.4em] uppercase font-semibold mb-4">
-                    Momentos
-                </h2>
-                <p className="text-3xl md:text-4xl font-['Cinzel'] text-gray-800">
-                    Nossa Galeria
-                </p>
-            </div>
-
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 group">
-                
-                {/* O Carrossel (Embla) */}
-                <div className="overflow-hidden" ref={emblaRef}>
-                    <div className="flex touch-pan-y items-center">
-                        {photos.map((photo, index) => (
-                            // Aspect-ratio focado em retrato (mais elegante para casamentos)
-                            <div 
-                                key={index} 
-                                className="relative flex-[0_0_85%] md:flex-[0_0_60%] lg:flex-[0_0_50%] min-w-0 mx-2 md:mx-4 transition-all duration-700 ease-in-out"
-                                style={{
-                                    // Truque para as fotos laterais ficarem levemente opacas e menores
-                                    opacity: index === selectedIndex ? 1 : 0.4,
-                                    transform: index === selectedIndex ? 'scale(1)' : 'scale(0.9)'
-                                }}
-                            >
-                                <div className="aspect-[4/5] md:aspect-[16/10] overflow-hidden rounded-2xl shadow-[0_20px_50px_rgb(0,0,0,0.12)] bg-gray-100">
-                                    <img
-                                        src={photo.url}
-                                        alt={`Foto ${index + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Controles Minimalistas Flutuantes (Setas) */}
-                <button
-                    onClick={scrollPrev}
-                    className="absolute left-2 sm:left-10 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-md text-gray-800 rounded-full shadow-lg border border-gray-100 transition-all duration-300 hover:bg-white hover:scale-110 opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0"
-                    aria-label="Foto anterior"
-                >
-                    <ChevronLeft size={20} strokeWidth={1.5} className="-ml-1" />
-                </button>
-
-                <button
-                    onClick={scrollNext}
-                    className="absolute right-2 sm:right-10 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-md text-gray-800 rounded-full shadow-lg border border-gray-100 transition-all duration-300 hover:bg-white hover:scale-110 opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0"
-                    aria-label="Próxima foto"
-                >
-                    <ChevronRight size={20} strokeWidth={1.5} className="-mr-1" />
-                </button>
-            </div>
-
-            {/* Navegação por Pontos (Dots) Refinada */}
-            <div className="flex justify-center items-center gap-4 mt-12">
-                {photos.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => emblaApi?.scrollTo(index)}
-                        className="relative flex items-center justify-center w-6 h-6 group"
-                        aria-label={`Ir para foto ${index + 1}`}
-                    >
-                        <span 
-                            className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                                index === selectedIndex 
-                                    ? 'bg-[#9A7B6F] scale-125' 
-                                    : 'bg-gray-300 group-hover:bg-gray-400'
-                            }`}
+        {/* Carrossel */}
+        <div className="relative mx-auto max-w-7xl">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex touch-pan-y items-center">
+              {photos.map((photo, index) => {
+                const isActive = index === selectedIndex
+                return (
+                  <div
+                    key={index}
+                    className="relative flex-[0_0_88%] min-w-0 px-2 transition-all duration-700 ease-out sm:flex-[0_0_70%] md:flex-[0_0_55%] lg:flex-[0_0_45%] md:px-4"
+                    style={{ opacity: isActive ? 1 : 0.35, transform: isActive ? 'scale(1)' : 'scale(0.88)' }}
+                  >
+                    <div className={`relative overflow-hidden rounded-2xl transition-shadow duration-700 ${
+                      isActive ? 'shadow-[0_30px_80px_rgba(0,0,0,0.18)]' : 'shadow-md'
+                    }`}>
+                      <div className="aspect-[4/5] md:aspect-[16/10]">
+                        <img
+                          src={photo.url}
+                          alt={photo.caption}
+                          className="h-full w-full object-cover transition-transform duration-[2500ms] ease-out hover:scale-105"
+                          loading="lazy"
                         />
-                        {/* Anel de foco sutil em volta do ponto ativo */}
-                        {index === selectedIndex && (
-                            <span className="absolute inset-0 rounded-full border border-[#9A7B6F] animate-ping opacity-20" />
-                        )}
-                    </button>
-                ))}
+                      </div>
+                      <div className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+                        <p className="font-serif text-base font-medium italic text-white/90 drop-shadow md:text-lg">
+                          {photo.caption}
+                        </p>
+                        <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.3em] text-white/50">
+                          {String(index + 1).padStart(2, '0')} / {String(photos.length).padStart(2, '0')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-            
-        </section>
-    );
-};
+          </div>
 
-export default PhotoCarousel;
+          {/* Setas */}
+          <button onClick={scrollPrev} className="absolute left-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border border-rose-100 bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-rose-200 dark:border-slate-700 dark:bg-slate-800/90 dark:text-white sm:left-6 md:h-12 md:w-12">
+            <ChevronLeft size={18} strokeWidth={1.5} />
+          </button>
+          <button onClick={scrollNext} className="absolute right-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border border-rose-100 bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-rose-200 dark:border-slate-700 dark:bg-slate-800/90 dark:text-white sm:right-6 md:h-12 md:w-12">
+            <ChevronRight size={18} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Barra de progresso + dots + BOTÃO VER TODAS */}
+        <div className="relative mt-10 flex flex-col items-center gap-4 px-4">
+          <div className="h-[2px] w-32 overflow-hidden rounded-full bg-rose-100 dark:bg-slate-700">
+            <div
+              className="h-full rounded-full bg-rose-400 transition-all duration-500"
+              style={{ width: `${((selectedIndex + 1) / photos.length) * 100}%` }}
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            {photos.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => emblaApi?.scrollTo(index)}
+                aria-label={`Foto ${index + 1}`}
+                className="group relative flex h-5 w-5 items-center justify-center"
+              >
+                <span className={`block rounded-full transition-all duration-300 ${
+                  index === selectedIndex
+                    ? 'h-2 w-5 bg-rose-400'
+                    : 'h-1.5 w-1.5 bg-rose-200 group-hover:bg-rose-300 dark:bg-slate-600'
+                }`} />
+              </button>
+            ))}
+          </div>
+
+          {/* ✅ Botão Ver Todas */}
+          <button
+            onClick={() => setShowGallery(true)}
+            className="group mt-2 flex items-center gap-2.5 rounded-full border border-rose-200 bg-white px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-rose-500 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-50 hover:shadow-rose-100/60 dark:border-slate-700 dark:bg-slate-800 dark:text-rose-400 dark:hover:bg-slate-700"
+          >
+            <Images size={14} strokeWidth={1.5} />
+            Ver todas as fotos
+            <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-400 dark:bg-rose-900/30">
+              {photos.length}
+            </span>
+          </button>
+        </div>
+      </section>
+
+      {/* ─── Galeria modal ──────────────────────────── */}
+      {showGallery && <PhotoGallery onClose={() => setShowGallery(false)} />}
+    </>
+  )
+}
