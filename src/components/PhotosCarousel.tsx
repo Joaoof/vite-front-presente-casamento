@@ -4,20 +4,20 @@ import { ChevronLeft, ChevronRight, Heart, Images } from 'lucide-react'
 import PhotoGallery from './PhotoGallery'  // ← novo import
 
 const photos = [
-  { url: '/img3.JPG',  caption: 'O começo de tudo'    },
-  { url: '/img4.JPG',  caption: 'Cada detalhe importa' },
-  { url: '/img5.JPG',  caption: 'Momentos eternos'     },
-  { url: '/img6.JPG',  caption: 'Nossa história'       },
-  { url: '/img7.JPG',  caption: 'Sempre juntos'        },
-  { url: '/img8.JPG',  caption: 'Amor verdadeiro'      },
-  { url: '/img9.JPG',  caption: 'Para sempre'          },
-  { url: '/img10.JPG', caption: 'Eternamente'          },
-  { url: '/img11.JPG', caption: 'Eternamente'          },
-  { url: '/img12.JPG', caption: 'Eternamente'          },
-  { url: '/img13.JPG', caption: 'Eternamente'          },
-  { url: '/img14.JPG', caption: 'Eternamente'          },
-  { url: '/img15.JPG', caption: 'Eternamente'          },
-  { url: '/img16.JPG', caption: 'Eternamente'          },
+  { url: '/img3.webp',  caption: 'O começo de tudo'    },
+  { url: '/img4.webp',  caption: 'Cada detalhe importa' },
+  { url: '/img5.webp',  caption: 'Momentos eternos'     },
+  { url: '/img6.webp',  caption: 'Nossa história'       },
+  { url: '/img7.webp',  caption: 'Sempre juntos'        },
+  { url: '/img8.webp',  caption: 'Amor verdadeiro'      },
+  { url: '/img9.webp',  caption: 'Para sempre'          },
+  { url: '/img10.webp', caption: 'Eternamente'          },
+  { url: '/img11.webp', caption: 'Eternamente'          },
+  { url: '/img12.webp', caption: 'Eternamente'          },
+  { url: '/img13.webp', caption: 'Eternamente'          },
+  { url: '/img14.webp', caption: 'Eternamente'          },
+  { url: '/img15.webp', caption: 'Eternamente'          },
+  { url: '/img16.webp', caption: 'Eternamente'          },
 ].filter(p => p.url)
 
 export default function PhotoCarousel() {
@@ -95,6 +95,8 @@ export default function PhotoCarousel() {
                           alt={photo.caption}
                           className="h-full w-full object-cover transition-transform duration-[2500ms] ease-out hover:scale-105"
                           loading="lazy"
+                          decoding='async'
+                          style={{ contentVisibility: 'auto' }}   // ← browser pula se fora da tela
                         />
                       </div>
                       <div className={`absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>

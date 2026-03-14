@@ -3,20 +3,20 @@ import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 import { Heart } from 'lucide-react'
 
 const allPhotos = [
-  { url: '/img3.JPG',  caption: 'O começo de tudo'    },
-  { url: '/img4.JPG',  caption: 'Cada detalhe importa' },
-  { url: '/img5.JPG',  caption: 'Momentos eternos'     },
-  { url: '/img6.JPG',  caption: 'Nossa história'       },
-  { url: '/img7.JPG',  caption: 'Sempre juntos'        },
-  { url: '/img8.JPG',  caption: 'Amor verdadeiro'      },
-  { url: '/img9.JPG',  caption: 'Para sempre'          },
-  { url: '/img10.JPG', caption: 'Eternamente'          },
-  { url: '/img11.JPG', caption: 'Eternamente'          },
-  { url: '/img12.JPG', caption: 'Eternamente'          },
-  { url: '/img13.JPG', caption: 'Eternamente'          },
-  { url: '/img14.JPG', caption: 'Eternamente'          },
-  { url: '/img15.JPG', caption: 'Eternamente'          },
-  { url: '/img16.JPG', caption: 'Eternamente'          },
+  { url: '/img3.webp',  caption: 'O começo de tudo'    },
+  { url: '/img4.webp',  caption: 'Cada detalhe importa' },
+  { url: '/img5.webp',  caption: 'Momentos eternos'     },
+  { url: '/img6.webp',  caption: 'Nossa história'       },
+  { url: '/img7.webp',  caption: 'Sempre juntos'        },
+  { url: '/img8.webp',  caption: 'Amor verdadeiro'      },
+  { url: '/img9.webp',  caption: 'Para sempre'          },
+  { url: '/img10.webp', caption: 'Eternamente'          },
+  { url: '/img11.webp', caption: 'Eternamente'          },
+  { url: '/img12.webp', caption: 'Eternamente'          },
+  { url: '/img13.webp', caption: 'Eternamente'          },
+  { url: '/img14.webp', caption: 'Eternamente'          },
+  { url: '/img15.webp', caption: 'Eternamente'          },
+  { url: '/img16.webp', caption: 'Eternamente'          },
 
 ].filter(p => p.url)
 
