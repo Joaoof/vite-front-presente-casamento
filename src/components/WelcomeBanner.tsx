@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Heart } from 'lucide-react';
-
 const WelcomeBanner: React.FC = () => {
     const [step, setStep] = useState<0 | 1 | 2 | 'done'>(0);
     const [isVisible, setIsVisible] = useState(false);
@@ -45,7 +43,8 @@ const WelcomeBanner: React.FC = () => {
 
                 {step === 0 && (
                     <div className="space-y-6">
-                        <Heart size={32} strokeWidth={1.5} className="mx-auto text-slate-400" />
+                        {/* Imagem centralizada com mx-auto */}
+                        <img src="https://cdn-icons-png.flaticon.com/512/5166/5166470.png" alt="" width={40} className="mx-auto" />
                         <div className="space-y-2">
                             <span className="text-[10px] tracking-[0.4em] uppercase text-slate-500 font-medium">Luís & Natiele</span>
                             <h1 className="text-3xl font-light tracking-tight text-slate-100">Bem-vindos ao nosso <br /> pequeno espaço</h1>
@@ -64,7 +63,8 @@ const WelcomeBanner: React.FC = () => {
 
                 {step === 2 && (
                     <div className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md shadow-2xl">
-                        <Heart size={24} className="mx-auto mb-6 text-rose-400/80" fill="currentColor" />
+                        {/* Imagem centralizada com mx-auto e margem inferior (mb-6) para manter a proporção */}
+                        <img src="https://images.icon-icons.com/3525/PNG/512/web_online_internet_global_earth_world_globe_icon_221254.png" alt="" width={100} className="mx-auto mb-6" />
                         <h2 className="text-xl font-semibold text-slate-100 mb-3">Site</h2>
                         <p className="text-slate-400 text-sm mb-8 leading-relaxed font-light">
                             Criamos uma seleção para facilitar caso queira nos presentear, mas sua presença é o que mais importa.
