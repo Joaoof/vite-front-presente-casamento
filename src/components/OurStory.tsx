@@ -1,50 +1,320 @@
-import { Heart, Plane, Dog, Infinity, MapPin, Calendar } from "lucide-react"
+'use client'
+import { Heart, MapPin, Calendar } from "lucide-react"
 import StickyReveal from "./Reveal"
 import { useNavigate } from "react-router-dom"
+import { useState, useRef, useEffect } from 'react'
 
+// ─────────────────────────────────────────
+// DADOS
+// ─────────────────────────────────────────
 const TIMELINE_EVENTS = [
-  { date: "Out, 2018", title: "Aquele jantar",   text: "Era pra ser só um café, mas a conversa fluiu por horas. Ali ficou claro que não seria mais um encontro.", side: "top" },
-  { date: "Mar, 2019", title: "Primeira viagem", text: "Decidimos viajar juntos pela primeira vez. Cada detalhe confirmava que éramos perfeitos um para o outro.", side: "bottom" },
-  { date: "Dez, 2020", title: "Nosso lar",       text: "Mudamos juntos e transformamos quatro paredes em um lar cheio de vida, amor e Oliver.", side: "top" },
-  { date: "Jun, 2022", title: "Oliver e Luna",   text: "Adotamos nossos dois companheiros de vida. A casa nunca mais foi a mesma.", side: "bottom" },
-  { date: "Out, 2024", title: "O pedido",        text: "Na mesma praça onde tudo começou, ele pediu em casamento.", side: "top" },
-  { date: "Out, 2025", title: "Casamento",       text: "E agora, queremos celebrar tudo isso com as pessoas que amamos.", side: "bottom" },
+  {
+    date: "Março, 2025",
+    title: "Primeiro namoro",
+    text: "O começo de tudo. Uma rosa, um momento, e uma história que mudaria nossas vidas.",
+    img: "/pedido-namoro.jpeg",
+  },
+  {
+    date: "Julho, 2025",
+    title: "Primeiro mês juntos",
+    text: "Um mês depois, já sabíamos que era pra durar. Cada dia melhor que o anterior.",
+    img: "/juntos.jpeg",
+  },
+  {
+    date: "12 Jul",
+    title: "Dia 12 de julho",
+    text: "Uma data que guardamos no coração — celebrada com carinho todo ano.",
+    img: "/juntos-2.jpeg",
+  },
+  {
+    date: "14 Jun",
+    title: "Primeiro piquenique",
+    text: "Uma mesa simples, dois pratos e muito amor. Esse jantar ficou na memória.",
+    img: "/pequinique.jpeg",
+  },
+  {
+    date: "31 Jan",
+    title: "Curso de noivos",
+    text: "Ajoelhado diante dela, com um buquê e um anel. Ela disse sim.",
+    img: "/curso-noivado.jpeg",
+  },
 ]
 
+const TIMELINE_ICONS = [
+  <svg key="flower" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+    <path d="M12 22V12M12 12C12 12 8 10 8 6a4 4 0 0 1 8 0c0 4-4 6-4 6z" strokeLinecap="round" />
+    <path d="M12 12c0 0-4-2-6 1s0 6 3 5M12 12c0 0 4-2 6 1s0 6-3 5" strokeLinecap="round" />
+  </svg>,
+  <svg key="heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" strokeLinecap="round" />
+  </svg>,
+  <svg key="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+  </svg>,
+  <svg key="food" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6h3v7" strokeLinecap="round" />
+  </svg>,
+  <svg key="ring" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+    <circle cx="12" cy="15" r="6" />
+    <path d="M9 9l1.5-4h3L15 9" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 9h6" strokeLinecap="round" />
+  </svg>,
+]
+
+// ─────────────────────────────────────────
+// STORIES FULL SCREEN
+// ─────────────────────────────────────────
+function StoriesTimeline({
+  events,
+  icons,
+}: {
+  events: typeof TIMELINE_EVENTS
+  icons: React.ReactNode[]
+}) {
+  const [current, setCurrent] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const DURATION = 5000
+  const TICK = 50
+
+  useEffect(() => {
+    if (paused) return
+    const id = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+          setCurrent(c => (c + 1 < events.length ? c + 1 : c))
+          return 0
+        }
+        return p + (TICK / DURATION) * 100
+      })
+    }, TICK)
+    return () => clearInterval(id)
+  }, [current, paused, events.length])
+
+  useEffect(() => { setProgress(0) }, [current])
+
+  const goTo = (i: number) => {
+    if (i >= 0 && i < events.length) { setCurrent(i); setProgress(0) }
+  }
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    setPaused(true)
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    setPaused(false)
+    if (touchStartX.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = Math.abs(e.changedTouches[0].clientY - (touchStartY.current ?? 0))
+    if (Math.abs(dx) > 40 && dy < 60) dx < 0 ? goTo(current + 1) : goTo(current - 1)
+    touchStartX.current = null
+  }
+
+  const event = events[current]
+
+  return (
+    <div
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        background: '#000',
+        touchAction: 'pan-y',
+      }}
+    >
+      {/* Foto full screen */}
+      <img
+        key={current}
+        src={event.img}
+        alt={event.title}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center top',
+          animation: 'storyFadeIn 0.35s ease',
+        }}
+      />
+
+      {/* Vinheta */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 25%, transparent 55%, rgba(0,0,0,0.88) 100%)',
+      }} />
+
+      {/* ── Header ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '48px 14px 0' }}>
+        {/* Barras */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
+          {events.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)}
+              style={{ flex: 1, height: 2.5, borderRadius: 2, background: 'rgba(255,255,255,0.3)', overflow: 'hidden', border: 'none', padding: 0, cursor: 'pointer' }}>
+              <div style={{
+                height: '100%', borderRadius: 2, background: 'white',
+                width: i < current ? '100%' : i === current ? `${progress}%` : '0%',
+              }} />
+            </button>
+          ))}
+        </div>
+
+        {/* Avatar + nome + fechar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', border: '2px solid white', flexShrink: 0,
+          }}>
+            {icons[current]}
+          </div>
+          <div>
+            <p style={{ color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1.2, margin: 0 }}>
+              Luís &amp; Natiele
+            </p>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, margin: 0 }}>{event.date}</p>
+          </div>
+          <button
+            onClick={() => document.dispatchEvent(new CustomEvent('stories:close'))}
+            style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.8)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Zonas toque L/R */}
+      <button aria-label="Anterior"
+        onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
+        onClick={() => goTo(current - 1)}
+        style={{ position: 'absolute', inset: '80px 60% 30% 0', background: 'none', border: 'none', cursor: 'default' }}
+      />
+      <button aria-label="Próximo"
+        onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
+        onClick={() => goTo(current + 1)}
+        style={{ position: 'absolute', inset: '80px 0 30% 60%', background: 'none', border: 'none', cursor: 'default' }}
+      />
+
+      {/* Conteúdo inferior */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 20px 52px' }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: 6 }}>
+          {current + 1} de {events.length}
+        </p>
+        <h3 style={{ color: 'white', fontFamily: 'serif', fontSize: 28, fontWeight: 700, fontStyle: 'italic', lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
+          {event.title}
+        </h3>
+        <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+          {event.text}
+        </p>
+        {current === events.length - 1 && (
+          <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'serif', fontStyle: 'italic' }}>
+              E a história continua...
+            </span>
+            <Heart size={14} style={{ color: '#F4A7B9', fill: '#F4A7B9' } as React.CSSProperties} />
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes storyFadeIn {
+          from { opacity: 0; transform: scale(1.03); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────
+// ENTRY — avatares circulares
+// ─────────────────────────────────────────
+function StoriesEntry({
+  events,
+  icons,
+}: {
+  events: typeof TIMELINE_EVENTS
+  icons: React.ReactNode[]
+}) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const close = () => setOpen(false)
+    document.addEventListener('stories:close', close)
+    return () => document.removeEventListener('stories:close', close)
+  }, [])
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+        <p style={{ color: '#7AAFD4', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, margin: 0 }}>
+          Nossa história em fotos
+        </p>
+
+        {/* Avatares */}
+        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, width: '100%', justifyContent: 'center' }}>
+          {events.map((event, i) => (
+            <button key={i} onClick={() => setOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+              {/* Anel gradiente estilo IG */}
+              <div style={{ padding: 2, borderRadius: '50%', background: 'linear-gradient(45deg, #1B3A6B, #4A7AB5, #7AAFD4)' }}>
+                <div style={{ padding: 2, borderRadius: '50%', background: 'white' }}>
+                  <img src={event.img} alt={event.title}
+                    style={{ width: 58, height: 58, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+                  />
+                </div>
+              </div>
+              <span style={{ color: '#1B3A6B', fontSize: 10, fontWeight: 600, maxWidth: 64, textAlign: 'center', lineHeight: 1.3 }}>
+                {event.title}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <p style={{ color: 'rgba(74,122,181,0.5)', fontSize: 11, fontStyle: 'italic', margin: 0 }}>
+          Toque para ver nossa história
+        </p>
+      </div>
+
+      {open && <StoriesTimeline events={events} icons={icons} />}
+    </>
+  )
+}
+
+// ─────────────────────────────────────────
+// PAGE
+// ─────────────────────────────────────────
 export default function OurStory() {
   const navigate = useNavigate()
 
   return (
-    <div className="relative flex flex-col w-full overflow-x-hidden font-sans text-slate-800 dark:text-slate-100">
-
+    <div
+      className="relative flex flex-col overflow-x-hidden font-sans text-slate-800 dark:text-slate-100"
+      style={{ width: '100vw', marginLeft: '50%', transform: 'translateX(-50%)' }}
+    >
       <style>{`
         @keyframes marquee {
           from { transform: translateX(0); }
           to   { transform: translateX(-50%); }
         }
-        .animate-marquee {
-          display: flex;
-          width: max-content;
-          animation: marquee 28s linear infinite;
-        }
+        .animate-marquee { display: flex; width: max-content; animation: marquee 28s linear infinite; }
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50%       { transform: translateY(-8px); }
         }
         .animate-float { animation: float 3s ease-in-out infinite; }
-
-        .timeline-mobile-line::before {
-          content: '';
-          position: absolute;
-          left: 13px;
-          top: 0;
-          bottom: 0;
-          width: 2px;
-          background: linear-gradient(to bottom, #4A7AB5, #C8DCF0, transparent);
-        }
       `}</style>
 
-      {/* ─── BANNER ───────────────────────────────────────── */}
+      {/* ── BANNER ── */}
       <div className="sticky top-0 z-50 w-full overflow-hidden py-2 shadow-md md:py-2.5"
         style={{ background: 'linear-gradient(90deg, #1B3A6B, #4A7AB5, #1B3A6B)' }}>
         <div className="animate-marquee flex items-center whitespace-nowrap text-white">
@@ -53,7 +323,7 @@ export default function OurStory() {
               <span className="text-blue-200/60">✦</span>
               celebrando o amor de
               <span className="rounded-full border border-white/30 bg-white/10 px-3 py-0.5 font-bold tracking-widest md:px-4">
-                Luís & Natiele
+                Luís &amp; Natiele
               </span>
               25 · 07 · 2026
               <span className="text-blue-200/60">✦</span>
@@ -62,27 +332,23 @@ export default function OurStory() {
         </div>
       </div>
 
-      {/* ─── SEÇÃO 1 — HERO ───────────────────────────────── */}
+      {/* ── HERO ── */}
       <StickyReveal index={0}>
         <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
           <div className="absolute inset-0 scale-105 bg-cover bg-center" style={{ backgroundImage: 'url("img2.JPG")' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#1B3A6B]/10 via-[#1B3A6B]/40 to-[#1B3A6B]/75" />
-
           <div className="relative z-10 flex flex-col items-center px-6 text-center">
             <div className="mb-5 flex items-center gap-3 opacity-70">
               <div className="h-[1px] w-8 bg-blue-200 md:w-12" />
               <Heart className="h-3.5 w-3.5 fill-blue-200 text-blue-200 md:h-4 md:w-4" />
               <div className="h-[1px] w-8 bg-blue-200 md:w-12" />
             </div>
-
             <p className="mb-3 text-[9px] font-medium uppercase tracking-[0.4em] text-blue-200 md:text-[10px]">
               A nossa história
             </p>
-
             <h1 className="mb-4 font-serif text-[2.8rem] font-bold leading-tight text-white drop-shadow-2xl sm:text-4xl md:text-5xl">
-              Luís & Natiele
+              Luís &amp; Natiele
             </h1>
-
             <div className="mt-3 flex flex-col items-center gap-2 sm:flex-row sm:gap-6">
               <span className="flex items-center gap-1.5 text-xs font-light tracking-widest text-white/80 md:text-sm">
                 <Calendar className="h-3 w-3 text-blue-200 md:h-3.5 md:w-3.5" />
@@ -95,7 +361,6 @@ export default function OurStory() {
               </span>
             </div>
           </div>
-
           <div className="animate-float absolute bottom-8 flex flex-col items-center gap-2">
             <span className="text-[8px] uppercase tracking-[0.4em] text-white/50 md:text-[9px]">Deslize</span>
             <div className="flex h-8 w-4 items-start justify-center rounded-full border border-white/30 p-1 md:h-9 md:w-5">
@@ -105,11 +370,10 @@ export default function OurStory() {
         </div>
       </StickyReveal>
 
-      {/* ─── SEÇÃO 2 — CITAÇÃO ────────────────────────────── */}
+      {/* ── CITAÇÃO ── */}
       <StickyReveal index={1}>
         <section className="flex min-h-screen w-full items-center justify-center bg-[#f0f6ff] px-6 py-20 dark:bg-slate-900">
           <div className="flex max-w-xl flex-col items-center text-center">
-            {/* Aspas na cor azul claro */}
             <span className="mb-2 select-none font-serif text-6xl leading-none text-[#C8DCF0] dark:text-[#1B3A6B]/60 md:text-7xl">"</span>
             <p className="font-serif text-lg leading-[1.9] text-slate-600 dark:text-slate-400 md:text-2xl">
               Foi nos detalhes mais simples que construímos o nosso maior amor.
@@ -127,254 +391,161 @@ export default function OurStory() {
         </section>
       </StickyReveal>
 
-      {/* ─── SEÇÃO 3 — TIMELINE ───────────────────────────── */}
+      {/* ── TIMELINE ── */}
       <StickyReveal index={2}>
-  <section className="flex min-h-screen w-full items-center overflow-hidden py-24 dark:bg-slate-800/90"
-    style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f0f6ff 50%, #ffffff 100%)' }}>
-    <div className="mx-auto w-full max-w-6xl px-5 md:px-10">
-
-      {/* ── Cabeçalho ── */}
-      <div className="mb-16 flex flex-col items-center text-center md:mb-24">
-        <span className="mb-3 inline-flex items-center gap-2 rounded-full border px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.35em]"
-          style={{ borderColor: '#C8DCF0', color: '#4A7AB5', background: 'rgba(200,220,240,0.2)' }}>
-          <Heart className="h-2.5 w-2.5 fill-[#4A7AB5]" />
-          Nossa jornada
-        </span>
-        <h2 className="font-serif text-3xl font-bold md:text-5xl" style={{ color: '#1B3A6B' }}>
-          Como Tudo Começou
-        </h2>
-        <div className="mt-4 flex items-center gap-3">
-          <div className="h-[1px] w-12" style={{ background: '#C8DCF0' }} />
-          <div className="h-1.5 w-1.5 rounded-full" style={{ background: '#4A7AB5' }} />
-          <div className="h-[1px] w-12" style={{ background: '#C8DCF0' }} />
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════
-          DESKTOP — cards alternados com linha central
-      ══════════════════════════════════════════ */}
-      <div className="relative hidden md:block">
-
-        {/* Linha central vertical */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2"
-          style={{ background: 'linear-gradient(to bottom, transparent, #C8DCF0 10%, #C8DCF0 90%, transparent)' }} />
-
-        <div className="flex flex-col gap-0">
-          {TIMELINE_EVENTS.map((event, i) => {
-            const isLeft = i % 2 === 0;
-            return (
-              <div key={i} className="relative grid grid-cols-2 items-center gap-0" style={{ minHeight: '160px' }}>
-
-                {/* ── Lado esquerdo ── */}
-                <div className={`flex justify-end pr-12 ${isLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                  {isLeft && (
-                    <div className="group relative max-w-sm w-full cursor-default">
-                      {/* Card */}
-                      <div className="relative overflow-hidden rounded-2xl border bg-white p-6 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
-                        style={{ borderColor: '#e8f1fb' }}>
-                        {/* Faixa decorativa lateral */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
-                          style={{ background: 'linear-gradient(to bottom, #1B3A6B, #4A7AB5)' }} />
-                        <div className="pl-3">
-                          <span className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.25em]"
-                            style={{ background: 'rgba(200,220,240,0.3)', color: '#4A7AB5' }}>
-                            {event.date}
-                          </span>
-                          <h4 className="mb-2 font-serif text-lg font-bold leading-tight" style={{ color: '#1B3A6B' }}>
-                            {event.title}
-                          </h4>
-                          <p className="text-xs leading-relaxed text-slate-400">{event.text}</p>
-                        </div>
-                        {/* Brilho no hover */}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                          style={{ background: 'linear-gradient(135deg, rgba(200,220,240,0.15) 0%, transparent 60%)' }} />
-                      </div>
-                      {/* Seta apontando para a linha */}
-                      <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-t border-r bg-white"
-                        style={{ borderColor: '#e8f1fb' }} />
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Ponto central ── */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                  {i % 2 === 0 ? (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full ring-4 ring-white shadow-lg transition-transform duration-300 hover:scale-110"
-                      style={{ background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)', boxShadow: '0 4px 16px rgba(27,58,107,0.35)' }}>
-                      <Heart className="h-4 w-4 fill-white text-white" />
-                    </div>
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white ring-4 ring-white shadow-lg transition-transform duration-300 hover:scale-110"
-                      style={{ borderColor: '#4A7AB5', boxShadow: '0 4px 16px rgba(74,122,181,0.25)' }}>
-                      <div className="h-3 w-3 rounded-full" style={{ background: '#4A7AB5' }} />
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Lado direito ── */}
-                <div className={`flex justify-start pl-12 ${!isLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                  {!isLeft && (
-                    <div className="group relative max-w-sm w-full cursor-default">
-                      {/* Seta apontando para a linha */}
-                      <div className="absolute left-[-8px] top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-b border-l bg-white"
-                        style={{ borderColor: '#e8f1fb' }} />
-                      {/* Card */}
-                      <div className="relative overflow-hidden rounded-2xl border bg-white p-6 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
-                        style={{ borderColor: '#e8f1fb' }}>
-                        <div className="absolute right-0 top-0 bottom-0 w-1 rounded-r-2xl"
-                          style={{ background: 'linear-gradient(to bottom, #4A7AB5, #7AAFD4)' }} />
-                        <div className="pr-3">
-                          <span className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.25em]"
-                            style={{ background: 'rgba(200,220,240,0.3)', color: '#4A7AB5' }}>
-                            {event.date}
-                          </span>
-                          <h4 className="mb-2 font-serif text-lg font-bold leading-tight" style={{ color: '#1B3A6B' }}>
-                            {event.title}
-                          </h4>
-                          <p className="text-xs leading-relaxed text-slate-400">{event.text}</p>
-                        </div>
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                          style={{ background: 'linear-gradient(225deg, rgba(200,220,240,0.15) 0%, transparent 60%)' }} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Ícone de aliança no fim da linha */}
-        <div className="mt-6 flex justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full ring-4 ring-white shadow-xl"
-            style={{ background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)', boxShadow: '0 6px 24px rgba(27,58,107,0.4)' }}>
-            <Heart className="h-5 w-5 fill-white text-white" />
+        <section
+          className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden py-20 dark:bg-slate-800/90"
+          style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f0f6ff 60%, #ffffff 100%)' }}
+        >
+          <div className="pointer-events-none absolute top-0 left-0 select-none opacity-20" aria-hidden>
+            <svg width="180" height="180" viewBox="0 0 200 200" fill="none">
+              <ellipse cx="30" cy="60" rx="12" ry="34" transform="rotate(-40 30 60)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="60" cy="30" rx="10" ry="30" transform="rotate(-20 60 30)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="90" cy="15" rx="9" ry="26" transform="rotate(5 90 15)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="120" cy="20" rx="8" ry="24" transform="rotate(25 120 20)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="145" cy="40" rx="8" ry="22" transform="rotate(45 145 40)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <path d="M20 80 Q70 50 150 55" stroke="#4A7AB5" strokeWidth="1" fill="none" />
+            </svg>
           </div>
-        </div>
-      </div>
+          <div className="pointer-events-none absolute bottom-0 right-0 select-none rotate-180 opacity-20" aria-hidden>
+            <svg width="180" height="180" viewBox="0 0 200 200" fill="none">
+              <ellipse cx="30" cy="60" rx="12" ry="34" transform="rotate(-40 30 60)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="60" cy="30" rx="10" ry="30" transform="rotate(-20 60 30)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="90" cy="15" rx="9" ry="26" transform="rotate(5 90 15)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="120" cy="20" rx="8" ry="24" transform="rotate(25 120 20)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <ellipse cx="145" cy="40" rx="8" ry="22" transform="rotate(45 145 40)" stroke="#4A7AB5" strokeWidth="1.2" />
+              <path d="M20 80 Q70 50 150 55" stroke="#4A7AB5" strokeWidth="1" fill="none" />
+            </svg>
+          </div>
 
-      {/* ══════════════════════════════════════════
-          MOBILE — cards verticais elegantes
-      ══════════════════════════════════════════ */}
-      <div className="relative flex flex-col md:hidden">
-
-        {/* Linha vertical contínua */}
-        <div className="absolute left-[19px] top-2 bottom-8 w-[2px]"
-          style={{ background: 'linear-gradient(to bottom, #1B3A6B, #C8DCF0, transparent)' }} />
-
-        {TIMELINE_EVENTS.map((event, i) => (
-          <div key={i} className="relative flex items-start gap-5 pb-10">
-
-            {/* Ponto */}
-            <div className="relative z-10 shrink-0 mt-1">
-              {i % 2 === 0 ? (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full ring-4 ring-white shadow-md"
-                  style={{ background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)', boxShadow: '0 4px 12px rgba(27,58,107,0.3)' }}>
-                  <Heart className="h-3.5 w-3.5 fill-white text-white" />
-                </div>
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white ring-4 ring-white shadow-md"
-                  style={{ borderColor: '#4A7AB5' }}>
-                  <div className="h-3 w-3 rounded-full" style={{ background: '#4A7AB5' }} />
-                </div>
-              )}
-              {/* Número do evento */}
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white"
-                style={{ background: '#1B3A6B' }}>
-                {i + 1}
-              </span>
+          <div className="relative mx-auto w-full max-w-5xl px-5 md:px-10">
+            <div className="mb-14 flex flex-col items-center text-center">
+              <p className="mb-1 font-serif text-3xl md:text-4xl" style={{ color: '#4A7AB5' }}>Nossa Jornada</p>
+              <p className="mb-3 text-sm tracking-[0.25em]" style={{ color: '#7AAFD4' }}>25 · 07 · 2026</p>
             </div>
 
-            {/* Card */}
-            <div className="flex-1 overflow-hidden rounded-2xl border bg-white shadow-sm"
-              style={{ borderColor: '#e8f1fb' }}>
-              {/* Topo colorido do card */}
-              <div className="h-1 w-full"
-                style={{ background: i % 2 === 0
-                  ? 'linear-gradient(to right, #1B3A6B, #4A7AB5)'
-                  : 'linear-gradient(to right, #4A7AB5, #7AAFD4)' }} />
-              <div className="p-4">
-                <span className="mb-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em]"
-                  style={{ background: 'rgba(200,220,240,0.3)', color: '#4A7AB5' }}>
-                  {event.date}
-                </span>
-                <h4 className="mb-1.5 font-serif text-base font-bold" style={{ color: '#1B3A6B' }}>
-                  {event.title}
-                </h4>
-                <p className="text-xs leading-relaxed text-slate-500">{event.text}</p>
+            {/* DESKTOP */}
+            <div className="hidden md:block">
+              <div className="relative grid" style={{ gridTemplateColumns: `repeat(${TIMELINE_EVENTS.length}, 1fr)` }}>
+                <div className="absolute top-[40px] left-0 right-0 h-[1.5px] z-0"
+                  style={{ background: 'linear-gradient(to right, transparent 2%, #4A7AB5 10%, #4A7AB5 90%, transparent 98%)' }} />
+                {TIMELINE_EVENTS.map((event, i) => (
+                  <div key={i} className="group relative flex flex-col items-center">
+                    <div className="relative z-10 mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg"
+                      style={{ border: '1.5px solid #4A7AB5', color: '#4A7AB5', boxShadow: '0 2px 8px rgba(74,122,181,0.18)' }}>
+                      {TIMELINE_ICONS[i]}
+                    </div>
+                    <div className="relative z-10 h-2.5 w-2.5 rounded-full"
+                      style={{ background: '#4A7AB5', boxShadow: '0 0 0 3px white, 0 0 0 4.5px #4A7AB5' }} />
+                    <div className="my-2 h-4 w-[1.5px]" style={{ background: '#C8DCF0' }} />
+                    <p className="mb-0.5 text-center text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: '#1B3A6B' }}>
+                      {event.title}
+                    </p>
+                    <p className="mb-2 text-center text-[9px]" style={{ color: '#7AAFD4' }}>{event.date}</p>
+                    <div className="relative h-0 w-[110px] overflow-visible">
+                      <div className="absolute left-1/2 top-0 -translate-x-1/2 overflow-hidden rounded-xl opacity-0 shadow-xl transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-1"
+                        style={{ width: '110px', zIndex: 50, border: '2px solid #C8DCF0', boxShadow: '0 8px 32px rgba(27,58,107,0.25)' }}>
+                        <img src={event.img} alt={event.title} className="h-[130px] w-full object-cover" />
+                        <div className="px-2 py-1.5" style={{ background: '#1B3A6B' }}>
+                          <p className="text-center text-[8px] leading-snug text-white/70">{event.text}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-40 rounded-xl px-8 py-4 text-center"
+                style={{ background: 'rgba(200,220,240,0.15)', border: '1px solid #e8f1fb' }}>
+                <p className="text-xs leading-relaxed" style={{ color: '#7AAFD4' }}>
+                  Estamos muito felizes em ter você aqui e mal podemos esperar para celebrar com você!
+                </p>
               </div>
             </div>
 
+            {/* MOBILE — Stories */}
+            <div className="md:hidden">
+              <StoriesEntry events={TIMELINE_EVENTS} icons={TIMELINE_ICONS} />
+            </div>
           </div>
-        ))}
+        </section>
+      </StickyReveal>
 
-        {/* Final da linha */}
-        <div className="flex items-center gap-4 pl-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)' }}>
-            <Heart className="h-4 w-4 fill-white" />
-          </div>
-          <p className="font-serif text-sm italic" style={{ color: '#4A7AB5' }}>
-            E a história continua...
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-</StickyReveal>
-
-
-      {/* ─── SEÇÃO 4 — CTA ────────────────────────────────── */}
+      {/* ── CONVITE ── */}
       <StickyReveal index={4}>
-        <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#f0f6ff] px-6 text-center dark:bg-slate-900">
-          {/* Coração de fundo decorativo */}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
-            <Heart className="h-[500px] w-[500px]" style={{ fill: '#1B3A6B', color: '#1B3A6B' }} />
-          </div>
-
-          <div className="relative z-10 flex w-full max-w-lg flex-col items-center">
-            <div className="mb-6 flex items-center gap-3 md:mb-8">
-              <div className="h-[1px] w-10 bg-[#C8DCF0] md:w-12" />
-              <Heart className="h-3.5 w-3.5 fill-[#4A7AB5] text-[#4A7AB5]" />
-              <div className="h-[1px] w-10 bg-[#C8DCF0] md:w-12" />
+        <section className="relative flex h-screen w-full overflow-hidden dark:bg-slate-900">
+          <div className="flex w-full flex-col md:flex-row">
+            <div className="relative h-[40vh] w-full md:h-full md:w-1/2">
+              <img src="img9.JPG" alt="Luís e Natiele" className="h-full w-full object-cover object-top" />
+              <div className="absolute inset-0 hidden md:block"
+                style={{ background: 'linear-gradient(to right, transparent 55%, #1B3060 100%)' }} />
+              <div className="absolute inset-0 md:hidden"
+                style={{ background: 'linear-gradient(to bottom, transparent 55%, #1B3060 100%)' }} />
             </div>
 
-            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.4em] text-[#4A7AB5]">
-              Junte-se a nós
-            </p>
+            <div className="relative flex w-full flex-col items-start justify-center overflow-hidden px-8 py-10 md:w-1/2 md:px-12 md:py-12"
+              style={{ background: '#1B3060' }}>
 
-            <h2 className="mb-4 font-serif text-2xl text-[#1B3A6B] dark:text-white sm:text-3xl md:text-4xl">
-              Você faz parte<br />desta história.
-            </h2>
+              {/* Decorações SVG */}
+              <div className="pointer-events-none absolute top-0 right-0 select-none" aria-hidden>
+                <svg width="200" height="200" viewBox="0 0 280 280" fill="none">
+                  <path d="M270 5 Q240 50 210 80 Q180 110 150 150" stroke="rgba(200,220,240,0.35)" strokeWidth="1.5" fill="none" />
+                  <ellipse cx="252" cy="28" rx="9" ry="22" transform="rotate(-55 252 28)" fill="rgba(200,220,240,0.3)" />
+                  <ellipse cx="235" cy="52" rx="8" ry="19" transform="rotate(-35 235 52)" fill="rgba(200,220,240,0.28)" />
+                  <ellipse cx="218" cy="74" rx="8" ry="17" transform="rotate(-15 218 74)" fill="rgba(200,220,240,0.25)" />
+                  <ellipse cx="200" cy="98" rx="7" ry="16" transform="rotate(5 200 98)" fill="rgba(200,220,240,0.22)" />
+                  <ellipse cx="180" cy="122" rx="7" ry="15" transform="rotate(20 180 122)" fill="rgba(200,220,240,0.2)" />
+                  <circle cx="265" cy="18" r="4.5" fill="rgba(200,220,240,0.35)" />
+                  <circle cx="278" cy="28" r="3.5" fill="rgba(200,220,240,0.3)" />
+                  <circle cx="270" cy="36" r="3" fill="rgba(200,220,240,0.28)" />
+                </svg>
+              </div>
+              <div className="pointer-events-none absolute bottom-0 left-0 select-none" aria-hidden>
+                <svg width="160" height="160" viewBox="0 0 280 280" fill="none">
+                  <path d="M10 275 Q40 230 70 200 Q100 170 130 130" stroke="rgba(200,220,240,0.3)" strokeWidth="1.5" fill="none" />
+                  <ellipse cx="28" cy="252" rx="9" ry="22" transform="rotate(55 28 252)" fill="rgba(200,220,240,0.28)" />
+                  <ellipse cx="48" cy="228" rx="8" ry="19" transform="rotate(35 48 228)" fill="rgba(200,220,240,0.25)" />
+                  <circle cx="15" cy="262" r="4" fill="rgba(200,220,240,0.3)" />
+                  <circle cx="5" cy="252" r="3" fill="rgba(200,220,240,0.25)" />
+                </svg>
+              </div>
 
-            <p className="mb-8 text-sm leading-relaxed text-slate-500 dark:text-slate-400 md:mb-10 md:text-base">
-              Gostaríamos muito de ter você ao nosso lado neste dia tão especial.
-              Confirme sua presença e venha celebrar conosco!
-            </p>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.35em]"
+                style={{ color: 'rgba(200,220,240,0.45)' }}>
+                25 · 07 · 2026 &nbsp;·&nbsp; Araguaína, TO
+              </p>
+              <h2 className="mb-4 font-serif text-2xl font-bold text-white md:text-4xl lg:text-5xl">
+                Falta só
+                <span style={{ color: '#F4A7B9' }}> o seu nome.</span>
+              </h2>
+              <p className="mb-6 max-w-xs text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                A lista está quase completa. Confirme e a gente cuida do resto.
+              </p>
 
-            <button
-              onClick={() => navigate("/rsvp")}
-              className="group relative w-full overflow-hidden rounded-full px-10 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:w-auto"
-              style={{
-                background: '#1B3A6B',
-                boxShadow: '0 8px 24px rgba(27,58,107,0.35)',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#14305a')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#1B3A6B')}
-            >
-              {/* Shimmer */}
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              <span className="relative flex items-center justify-center gap-2">
-                <Heart className="h-4 w-4 fill-white" />
-                Confirmar Presença
-              </span>
-            </button>
+              <div className="group relative mb-6 w-full max-w-[220px] cursor-pointer overflow-hidden rounded-xl"
+                style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}
+                onClick={() => navigate("/rsvp")}>
+                <img src="/WhatsApp Image 2026-03-09 at 21.27.34.jpeg" alt="Convite"
+                  className="h-auto w-full object-contain transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: 'rgba(27,48,96,0.82)' }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" /><path d="M11 8v6M8 11h6" />
+                  </svg>
+                  <span className="rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em]"
+                    style={{ background: '#F4A7B9', color: '#1B3060' }}>
+                    Confirmar presença
+                  </span>
+                </div>
+                <div className="absolute inset-0 rounded-xl" style={{ border: '1px solid rgba(200,220,240,0.15)' }} />
+              </div>
 
-            <p className="mt-5 text-xs text-slate-400">
-              Responda até <span className="font-semibold text-[#4A7AB5]">01 de Março de 2026</span>
-            </p>
+              <p className="text-[11px]" style={{ color: 'rgba(200,220,240,0.3)' }}>
+                Até <span style={{ color: 'rgba(200,220,240,0.55)' }}>15 de junho de 2026</span>
+              </p>
+              <p className="mt-6 font-serif text-sm italic" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                Luís &amp; Natiele
+              </p>
+            </div>
           </div>
         </section>
       </StickyReveal>

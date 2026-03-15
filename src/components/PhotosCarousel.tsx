@@ -4,27 +4,27 @@ import { ChevronLeft, ChevronRight, Heart, Images } from 'lucide-react'
 import PhotoGallery from './PhotoGallery'
 
 const photos = [
-  { url: '/img3.webp',  caption: 'O começo de tudo'    },
-  { url: '/img4.webp',  caption: 'Cada detalhe importa' },
-  { url: '/img5.webp',  caption: 'Momentos eternos'     },
-  { url: '/img6.webp',  caption: 'Nossa história'       },
-  { url: '/img7.webp',  caption: 'Sempre juntos'        },
-  { url: '/img8.webp',  caption: 'Amor verdadeiro'      },
-  { url: '/img9.webp',  caption: 'Para sempre'          },
-  { url: '/img10.webp', caption: 'Eternamente'          },
-  { url: '/img11.webp', caption: 'Eternamente'          },
-  { url: '/img12.webp', caption: 'Eternamente'          },
-  { url: '/img13.webp', caption: 'Eternamente'          },
-  { url: '/img14.webp', caption: 'Eternamente'          },
-  { url: '/img15.webp', caption: 'Eternamente'          },
-  { url: '/img16.webp', caption: 'Eternamente'          },
+  { url: '/img3.webp', caption: 'O começo de tudo' },
+  { url: '/img4.webp', caption: 'Cada detalhe importa' },
+  { url: '/img5.webp', caption: 'Momentos eternos' },
+  { url: '/img6.webp', caption: 'Nossa história' },
+  { url: '/img7.webp', caption: 'Sempre juntos' },
+  { url: '/img8.webp', caption: 'Amor verdadeiro' },
+  { url: '/img9.webp', caption: 'Para sempre' },
+  { url: '/img10.webp', caption: 'Eternamente' },
+  { url: '/img11.webp', caption: 'Eternamente' },
+  { url: '/img12.webp', caption: 'Eternamente' },
+  { url: '/img13.webp', caption: 'Eternamente' },
+  { url: '/img14.webp', caption: 'Eternamente' },
+  { url: '/img15.webp', caption: 'Eternamente' },
+  { url: '/img16.webp', caption: 'Eternamente' },
 ].filter(p => p.url)
 
 export default function PhotoCarousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 35, align: 'center' })
   const [selectedIndex, setSelectedIndex] = React.useState(0)
-  const [isHovering, setIsHovering]       = React.useState(false)
-  const [showGallery, setShowGallery]     = React.useState(false)
+  const [isHovering, setIsHovering] = React.useState(false)
+  const [showGallery, setShowGallery] = React.useState(false)
 
   const scrollPrev = React.useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
   const scrollNext = React.useCallback(() => emblaApi?.scrollNext(), [emblaApi])
@@ -101,9 +101,8 @@ export default function PhotoCarousel() {
                     className="relative flex-[0_0_88%] min-w-0 px-2 transition-all duration-700 ease-out sm:flex-[0_0_70%] md:flex-[0_0_55%] lg:flex-[0_0_45%] md:px-4"
                     style={{ opacity: isActive ? 1 : 0.35, transform: isActive ? 'scale(1)' : 'scale(0.88)' }}
                   >
-                    <div className={`relative overflow-hidden rounded-2xl transition-shadow duration-700 ${
-                      isActive ? 'shadow-[0_30px_80px_rgba(27,58,107,0.2)]' : 'shadow-md'
-                    }`}>
+                    <div className={`relative overflow-hidden rounded-2xl transition-shadow duration-700 ${isActive ? 'shadow-[0_30px_80px_rgba(27,58,107,0.2)]' : 'shadow-md'
+                      }`}>
                       {/* Borda superior colorida no card ativo */}
                       {isActive && (
                         <div className="absolute top-0 left-0 right-0 h-1 z-10 rounded-t-2xl"
