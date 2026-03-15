@@ -82,22 +82,41 @@ function StoriesTimeline({
   const isSwiping = useRef(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioStarted = useRef(false)
   const DURATION = 5000
   const TICK = 50
 
-  // Música de fundo
+  // Cria o áudio mas NÃO tenta tocar ainda — mobile bloqueia sem interação
   useEffect(() => {
-    const audio = new Audio('/background-music.mp3')
+    const audio = new Audio('/audio/fundo.mp3')
     audio.loop = true
     audio.volume = 0.35
-    audio.play().catch(() => { })
     audioRef.current = audio
-    return () => { audio.pause(); audio.src = '' }
+    return () => {
+      audio.pause()
+      audio.src = ''
+    }
   }, [])
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = muted
   }, [muted])
+
+  // Inicia música no primeiro toque do usuário (resolve bloqueio de autoplay)
+  const startAudio = () => {
+    if (audioStarted.current || !audioRef.current) return
+    audioStarted.current = true
+    audioRef.current.play().catch(() => { })
+  }
+
+  // Fecha e para a música
+  const close = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+    document.dispatchEvent(new CustomEvent('stories:close'))
+  }
 
   // Progresso automático
   useEffect(() => {
@@ -116,7 +135,7 @@ function StoriesTimeline({
 
   useEffect(() => { setProgress(0) }, [current])
 
-  // touchmove com passive:false — só bloqueia scroll se for swipe horizontal
+  // touchmove passive:false — só bloqueia scroll se for swipe horizontal
   useEffect(() => {
     const el = cardRef.current
     if (!el) return
@@ -139,6 +158,7 @@ function StoriesTimeline({
   }
 
   const onTouchStart = (e: React.TouchEvent) => {
+    startAudio() // ← inicia música no primeiro toque
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
     isSwiping.current = false
@@ -160,7 +180,6 @@ function StoriesTimeline({
     isSwiping.current = false
   }
 
-  const close = () => document.dispatchEvent(new CustomEvent('stories:close'))
   const event = events[current]
 
   return (
@@ -180,7 +199,7 @@ function StoriesTimeline({
         }
       `}</style>
 
-      {/* Backdrop — intercepta scroll sem travar o body */}
+      {/* Backdrop */}
       <div
         onClick={close}
         style={{
@@ -189,7 +208,6 @@ function StoriesTimeline({
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           animation: 'backdropIn 0.25s ease both',
-          // impede que scroll do backdrop vaze para a página
           overscrollBehavior: 'contain',
           touchAction: 'none',
         }}
@@ -245,7 +263,7 @@ function StoriesTimeline({
             background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 28%, transparent 52%, rgba(0,0,0,0.92) 100%)',
           }} />
 
-          {/* Header — z-index alto para ficar acima das zonas de toque */}
+          {/* Header */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '14px 12px 0', zIndex: 10 }}>
             {/* Barras */}
             <div style={{ display: 'flex', gap: 3, marginBottom: 10 }}>
@@ -302,7 +320,7 @@ function StoriesTimeline({
                 )}
               </button>
 
-              {/* Fechar — padding grande para área de toque generosa */}
+              {/* Fechar */}
               <button
                 onClick={close}
                 style={{ color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 8, lineHeight: 0 }}
@@ -314,7 +332,7 @@ function StoriesTimeline({
             </div>
           </div>
 
-          {/* Zonas toque L/R — abaixo do header no z-index */}
+          {/* Zonas toque L/R */}
           <button aria-label="Anterior"
             onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
             onClick={() => goTo(current - 1)}
