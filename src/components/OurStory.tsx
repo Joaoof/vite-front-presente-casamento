@@ -62,23 +62,44 @@ const TIMELINE_ICONS = [
 ]
 
 // ─────────────────────────────────────────
-// STORIES FULL SCREEN
+// STORIES — Modal estilo Instagram
 // ─────────────────────────────────────────
 function StoriesTimeline({
   events,
   icons,
+  initialIndex = 0,
 }: {
   events: typeof TIMELINE_EVENTS
   icons: React.ReactNode[]
+  initialIndex?: number
 }) {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(initialIndex)
   const [paused, setPaused] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [muted, setMuted] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchStartY = useRef<number | null>(null)
+  const isSwiping = useRef(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const DURATION = 5000
   const TICK = 50
 
+  // Música de fundo
+  useEffect(() => {
+    const audio = new Audio('/background-music.mp3')
+    audio.loop = true
+    audio.volume = 0.35
+    audio.play().catch(() => { })
+    audioRef.current = audio
+    return () => { audio.pause(); audio.src = '' }
+  }, [])
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = muted
+  }, [muted])
+
+  // Progresso automático
   useEffect(() => {
     if (paused) return
     const id = setInterval(() => {
@@ -95,6 +116,24 @@ function StoriesTimeline({
 
   useEffect(() => { setProgress(0) }, [current])
 
+  // touchmove com passive:false — só bloqueia scroll se for swipe horizontal
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartX.current === null || touchStartY.current === null) return
+      const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
+      const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
+      if (dx > dy && dx > 8) {
+        isSwiping.current = true
+        setPaused(true)
+        e.preventDefault()
+      }
+    }
+    el.addEventListener('touchmove', handleTouchMove, { passive: false })
+    return () => el.removeEventListener('touchmove', handleTouchMove)
+  }, [])
+
   const goTo = (i: number) => {
     if (i >= 0 && i < events.length) { setCurrent(i); setProgress(0) }
   }
@@ -102,141 +141,222 @@ function StoriesTimeline({
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
-    setPaused(true)
-  }
-  const onTouchEnd = (e: React.TouchEvent) => {
-    setPaused(false)
-    if (touchStartX.current === null) return
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    const dy = Math.abs(e.changedTouches[0].clientY - (touchStartY.current ?? 0))
-    if (Math.abs(dx) > 40 && dy < 60) dx < 0 ? goTo(current + 1) : goTo(current - 1)
-    touchStartX.current = null
+    isSwiping.current = false
   }
 
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!isSwiping.current) {
+      touchStartX.current = null
+      touchStartY.current = null
+      return
+    }
+    setPaused(false)
+    if (touchStartX.current !== null) {
+      const dx = e.changedTouches[0].clientX - touchStartX.current
+      if (Math.abs(dx) > 40) dx < 0 ? goTo(current + 1) : goTo(current - 1)
+    }
+    touchStartX.current = null
+    touchStartY.current = null
+    isSwiping.current = false
+  }
+
+  const close = () => document.dispatchEvent(new CustomEvent('stories:close'))
   const event = events[current]
 
   return (
-    <div
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        background: '#000',
-        touchAction: 'pan-y',
-      }}
-    >
-      {/* Foto full screen */}
-      <img
-        key={current}
-        src={event.img}
-        alt={event.title}
+    <>
+      <style>{`
+        @keyframes storyFadeIn {
+          from { opacity: 0; transform: scale(1.04); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes storyModalIn {
+          from { opacity: 0; transform: scale(0.92); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes backdropIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+      `}</style>
+
+      {/* Backdrop — intercepta scroll sem travar o body */}
+      <div
+        onClick={close}
         style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center top',
-          animation: 'storyFadeIn 0.35s ease',
+          position: 'fixed', inset: 0, zIndex: 9998,
+          background: 'rgba(0,0,0,0.88)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          animation: 'backdropIn 0.25s ease both',
+          // impede que scroll do backdrop vaze para a página
+          overscrollBehavior: 'contain',
+          touchAction: 'none',
         }}
       />
 
-      {/* Vinheta */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 25%, transparent 55%, rgba(0,0,0,0.88) 100%)',
-      }} />
+      {/* Wrapper de posicionamento */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 'min(100vw, calc(100dvh * 9 / 16))',
+          height: 'min(100dvh, calc(100vw * 16 / 9))',
+          maxWidth: '420px',
+          maxHeight: '100dvh',
+          zIndex: 9999,
+        }}
+      >
+        {/* Card animado */}
+        <div
+          ref={cardRef}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            borderRadius: 'clamp(0px, 2vw, 20px)',
+            overflow: 'hidden',
+            background: '#111',
+            touchAction: 'pan-y',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.9)',
+            animation: 'storyModalIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both',
+          }}
+        >
+          {/* Foto */}
+          <img
+            key={current}
+            src={event.img}
+            alt={event.title}
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'center top',
+              animation: 'storyFadeIn 0.35s ease both',
+            }}
+          />
 
-      {/* ── Header ── */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '48px 14px 0' }}>
-        {/* Barras */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
-          {events.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)}
-              style={{ flex: 1, height: 2.5, borderRadius: 2, background: 'rgba(255,255,255,0.3)', overflow: 'hidden', border: 'none', padding: 0, cursor: 'pointer' }}>
-              <div style={{
-                height: '100%', borderRadius: 2, background: 'white',
-                width: i < current ? '100%' : i === current ? `${progress}%` : '0%',
-              }} />
-            </button>
-          ))}
-        </div>
-
-        {/* Avatar + nome + fechar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Vinheta */}
           <div style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', border: '2px solid white', flexShrink: 0,
-          }}>
-            {icons[current]}
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 28%, transparent 52%, rgba(0,0,0,0.92) 100%)',
+          }} />
+
+          {/* Header — z-index alto para ficar acima das zonas de toque */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '14px 12px 0', zIndex: 10 }}>
+            {/* Barras */}
+            <div style={{ display: 'flex', gap: 3, marginBottom: 10 }}>
+              {events.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  style={{
+                    flex: 1, height: 2.5, borderRadius: 2,
+                    background: 'rgba(255,255,255,0.3)',
+                    overflow: 'hidden', border: 'none', padding: 0, cursor: 'pointer',
+                  }}
+                >
+                  <div style={{
+                    height: '100%', borderRadius: 2, background: 'white',
+                    width: i < current ? '100%' : i === current ? `${progress}%` : '0%',
+                    transition: 'none',
+                  }} />
+                </button>
+              ))}
+            </div>
+
+            {/* Avatar + nome + botões */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', border: '2px solid white', flexShrink: 0,
+              }}>
+                {icons[current]}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1.2, margin: 0 }}>
+                  Luís &amp; Natiele
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 10, margin: 0 }}>{event.date}</p>
+              </div>
+
+              {/* Mute */}
+              <button
+                onClick={() => setMuted(m => !m)}
+                style={{ color: 'rgba(255,255,255,0.75)', background: 'none', border: 'none', cursor: 'pointer', padding: 8 }}
+              >
+                {muted ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                    <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Fechar — padding grande para área de toque generosa */}
+              <button
+                onClick={close}
+                style={{ color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 8, lineHeight: 0 }}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div>
-            <p style={{ color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1.2, margin: 0 }}>
-              Luís &amp; Natiele
+
+          {/* Zonas toque L/R — abaixo do header no z-index */}
+          <button aria-label="Anterior"
+            onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
+            onClick={() => goTo(current - 1)}
+            style={{ position: 'absolute', inset: '80px 60% 30% 0', zIndex: 5, background: 'none', border: 'none', cursor: 'default' }}
+          />
+          <button aria-label="Próximo"
+            onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
+            onClick={() => goTo(current + 1)}
+            style={{ position: 'absolute', inset: '80px 0 30% 60%', zIndex: 5, background: 'none', border: 'none', cursor: 'default' }}
+          />
+
+          {/* Conteúdo inferior */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 18px 32px', zIndex: 10 }}>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 9, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: 5 }}>
+              {current + 1} de {events.length}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, margin: 0 }}>{event.date}</p>
+            <h3 style={{ color: 'white', fontFamily: 'serif', fontSize: 26, fontWeight: 700, fontStyle: 'italic', lineHeight: 1.2, margin: '0 0 8px', textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
+              {event.title}
+            </h3>
+            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+              {event.text}
+            </p>
+            {current === events.length - 1 && (
+              <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'serif', fontStyle: 'italic' }}>
+                  E a história continua...
+                </span>
+                <Heart size={13} style={{ color: '#F4A7B9', fill: '#F4A7B9' } as React.CSSProperties} />
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => document.dispatchEvent(new CustomEvent('stories:close'))}
-            style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.8)', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+
         </div>
       </div>
-
-      {/* Zonas toque L/R */}
-      <button aria-label="Anterior"
-        onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
-        onClick={() => goTo(current - 1)}
-        style={{ position: 'absolute', inset: '80px 60% 30% 0', background: 'none', border: 'none', cursor: 'default' }}
-      />
-      <button aria-label="Próximo"
-        onMouseDown={() => setPaused(true)} onMouseUp={() => setPaused(false)}
-        onClick={() => goTo(current + 1)}
-        style={{ position: 'absolute', inset: '80px 0 30% 60%', background: 'none', border: 'none', cursor: 'default' }}
-      />
-
-      {/* Conteúdo inferior */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 20px 52px' }}>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: 6 }}>
-          {current + 1} de {events.length}
-        </p>
-        <h3 style={{ color: 'white', fontFamily: 'serif', fontSize: 28, fontWeight: 700, fontStyle: 'italic', lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
-          {event.title}
-        </h3>
-        <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>
-          {event.text}
-        </p>
-        {current === events.length - 1 && (
-          <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.2)' }} />
-            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'serif', fontStyle: 'italic' }}>
-              E a história continua...
-            </span>
-            <Heart size={14} style={{ color: '#F4A7B9', fill: '#F4A7B9' } as React.CSSProperties} />
-          </div>
-        )}
-      </div>
-
-      <style>{`
-        @keyframes storyFadeIn {
-          from { opacity: 0; transform: scale(1.03); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
-    </div>
+    </>
   )
 }
 
+
 // ─────────────────────────────────────────
-// ENTRY — avatares circulares
+// ENTRY — grid 3 × N linhas
 // ─────────────────────────────────────────
 function StoriesEntry({
   events,
@@ -246,6 +366,7 @@ function StoriesEntry({
   icons: React.ReactNode[]
 }) {
   const [open, setOpen] = useState(false)
+  const [startIndex, setStartIndex] = useState(0)
 
   useEffect(() => {
     const close = () => setOpen(false)
@@ -253,39 +374,57 @@ function StoriesEntry({
     return () => document.removeEventListener('stories:close', close)
   }, [])
 
+  const openAt = (i: number) => { setStartIndex(i); setOpen(true) }
+
+  const rows: (typeof events)[] = []
+  for (let i = 0; i < events.length; i += 3) rows.push(events.slice(i, i + 3))
+
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
         <p style={{ color: '#7AAFD4', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, margin: 0 }}>
           Nossa história em fotos
         </p>
 
-        {/* Avatares */}
-        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8, width: '100%', justifyContent: 'center' }}>
-          {events.map((event, i) => (
-            <button key={i} onClick={() => setOpen(true)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-              {/* Anel gradiente estilo IG */}
-              <div style={{ padding: 2, borderRadius: '50%', background: 'linear-gradient(45deg, #1B3A6B, #4A7AB5, #7AAFD4)' }}>
-                <div style={{ padding: 2, borderRadius: '50%', background: 'white' }}>
-                  <img src={event.img} alt={event.title}
-                    style={{ width: 58, height: 58, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
-                  />
-                </div>
-              </div>
-              <span style={{ color: '#1B3A6B', fontSize: 10, fontWeight: 600, maxWidth: 64, textAlign: 'center', lineHeight: 1.3 }}>
-                {event.title}
-              </span>
-            </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%' }}>
+          {rows.map((row, rowIdx) => (
+            <div key={rowIdx} style={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
+              {row.map((event, colIdx) => {
+                const idx = rowIdx * 3 + colIdx
+                return (
+                  <button key={idx} onClick={() => openAt(idx)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      gap: 7, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: 0,
+                    }}
+                  >
+                    <div style={{ padding: 2.5, borderRadius: '50%', background: 'linear-gradient(45deg, #1B3A6B, #4A7AB5, #7AAFD4)' }}>
+                      <div style={{ padding: 2, borderRadius: '50%', background: 'white' }}>
+                        <img src={event.img} alt={event.title}
+                          style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+                        />
+                      </div>
+                    </div>
+                    <span style={{ color: '#1B3A6B', fontSize: 10, fontWeight: 600, maxWidth: 72, textAlign: 'center', lineHeight: 1.3 }}>
+                      {event.title}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
           ))}
         </div>
 
-        <p style={{ color: 'rgba(74,122,181,0.5)', fontSize: 11, fontStyle: 'italic', margin: 0 }}>
-          Toque para ver nossa história
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', marginTop: 4 }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(74,122,181,0.15)' }} />
+          <p style={{ color: 'rgba(74,122,181,0.45)', fontSize: 11, fontStyle: 'italic', margin: 0, whiteSpace: 'nowrap' }}>
+            Toque para ver nossa história
+          </p>
+          <div style={{ flex: 1, height: 1, background: 'rgba(74,122,181,0.15)' }} />
+        </div>
       </div>
 
-      {open && <StoriesTimeline events={events} icons={icons} />}
+      {open && <StoriesTimeline events={events} icons={icons} initialIndex={startIndex} />}
     </>
   )
 }
@@ -314,7 +453,7 @@ export default function OurStory() {
         .animate-float { animation: float 3s ease-in-out infinite; }
       `}</style>
 
-      {/* ── BANNER ── */}
+      {/* BANNER */}
       <div className="sticky top-0 z-50 w-full overflow-hidden py-2 shadow-md md:py-2.5"
         style={{ background: 'linear-gradient(90deg, #1B3A6B, #4A7AB5, #1B3A6B)' }}>
         <div className="animate-marquee flex items-center whitespace-nowrap text-white">
@@ -332,7 +471,7 @@ export default function OurStory() {
         </div>
       </div>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <StickyReveal index={0}>
         <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
           <div className="absolute inset-0 scale-105 bg-cover bg-center" style={{ backgroundImage: 'url("img2.JPG")' }} />
@@ -370,7 +509,7 @@ export default function OurStory() {
         </div>
       </StickyReveal>
 
-      {/* ── CITAÇÃO ── */}
+      {/* CITAÇÃO */}
       <StickyReveal index={1}>
         <section className="flex min-h-screen w-full items-center justify-center bg-[#f0f6ff] px-6 py-20 dark:bg-slate-900">
           <div className="flex max-w-xl flex-col items-center text-center">
@@ -391,7 +530,7 @@ export default function OurStory() {
         </section>
       </StickyReveal>
 
-      {/* ── TIMELINE ── */}
+      {/* TIMELINE */}
       <StickyReveal index={2}>
         <section
           className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden py-20 dark:bg-slate-800/90"
@@ -462,7 +601,7 @@ export default function OurStory() {
               </div>
             </div>
 
-            {/* MOBILE — Stories */}
+            {/* MOBILE */}
             <div className="md:hidden">
               <StoriesEntry events={TIMELINE_EVENTS} icons={TIMELINE_ICONS} />
             </div>
@@ -470,7 +609,7 @@ export default function OurStory() {
         </section>
       </StickyReveal>
 
-      {/* ── CONVITE ── */}
+      {/* CONVITE */}
       <StickyReveal index={4}>
         <section className="relative flex h-screen w-full overflow-hidden dark:bg-slate-900">
           <div className="flex w-full flex-col md:flex-row">
@@ -481,11 +620,8 @@ export default function OurStory() {
               <div className="absolute inset-0 md:hidden"
                 style={{ background: 'linear-gradient(to bottom, transparent 55%, #1B3060 100%)' }} />
             </div>
-
             <div className="relative flex w-full flex-col items-start justify-center overflow-hidden px-8 py-10 md:w-1/2 md:px-12 md:py-12"
               style={{ background: '#1B3060' }}>
-
-              {/* Decorações SVG */}
               <div className="pointer-events-none absolute top-0 right-0 select-none" aria-hidden>
                 <svg width="200" height="200" viewBox="0 0 280 280" fill="none">
                   <path d="M270 5 Q240 50 210 80 Q180 110 150 150" stroke="rgba(200,220,240,0.35)" strokeWidth="1.5" fill="none" />
@@ -508,19 +644,16 @@ export default function OurStory() {
                   <circle cx="5" cy="252" r="3" fill="rgba(200,220,240,0.25)" />
                 </svg>
               </div>
-
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.35em]"
                 style={{ color: 'rgba(200,220,240,0.45)' }}>
                 25 · 07 · 2026 &nbsp;·&nbsp; Araguaína, TO
               </p>
               <h2 className="mb-4 font-serif text-2xl font-bold text-white md:text-4xl lg:text-5xl">
-                Falta só
-                <span style={{ color: '#F4A7B9' }}> o seu nome.</span>
+                Falta só <span style={{ color: '#F4A7B9' }}>o seu nome.</span>
               </h2>
               <p className="mb-6 max-w-xs text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 A lista está quase completa. Confirme e a gente cuida do resto.
               </p>
-
               <div className="group relative mb-6 w-full max-w-[220px] cursor-pointer overflow-hidden rounded-xl"
                 style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}
                 onClick={() => navigate("/rsvp")}>
@@ -538,7 +671,6 @@ export default function OurStory() {
                 </div>
                 <div className="absolute inset-0 rounded-xl" style={{ border: '1px solid rgba(200,220,240,0.15)' }} />
               </div>
-
               <p className="text-[11px]" style={{ color: 'rgba(200,220,240,0.3)' }}>
                 Até <span style={{ color: 'rgba(200,220,240,0.55)' }}>15 de junho de 2026</span>
               </p>
