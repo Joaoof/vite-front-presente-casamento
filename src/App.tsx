@@ -15,6 +15,7 @@ import OurStory from './components/OurStory'
 import RSVP from './components/RSVP'
 
 import './styles/animations.css'
+import WelcomeBanner from './components/WelcomeBanner'
 
 // ─── Página principal isolada ──────────────────────────────
 function HomePage() {
@@ -45,6 +46,8 @@ function HomePage() {
 
   return (
     <div className="bg-custom-header min-h-screen flex flex-col font-lato">
+      <WelcomeBanner />
+
       <Header
         coupleNames={coupleNames}
         weddingDate={weddingDate}
