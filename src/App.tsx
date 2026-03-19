@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext' // ← importa o Provider
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import { useGifts } from './hooks/useGifts'
 import { Gift } from './types'
@@ -16,17 +16,18 @@ import RSVP from './components/RSVP'
 
 import './styles/animations.css'
 import WelcomeBanner from './components/WelcomeBanner'
+import { DEFAULT_COUPLE_SLUG, getCoupleConfig, normalizeCoupleSlug } from './config/couples'
 
-// ─── Página principal isolada ──────────────────────────────
 function HomePage() {
-  const coupleNames = 'Luís & Natiele'
-  const weddingDate = '25 de Julho de 2026'
+  const { coupleSlug } = useParams<{ coupleSlug: string }>()
+  const normalizedCoupleSlug = normalizeCoupleSlug(coupleSlug)
+  const couple = getCoupleConfig(normalizedCoupleSlug)
 
   const { isAuthenticated, logout } = useAuth()
   const {
     gifts, addGift, updateGift, removeGift, reserveGift,
     searchTerm, setSearchTerm, filter, setFilter,
-  } = useGifts()
+  } = useGifts(normalizedCoupleSlug)
 
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [giftToEdit, setGiftToEdit] = useState<Gift | null>(null)
@@ -46,14 +47,12 @@ function HomePage() {
 
   return (
     <div className="bg-custom-header min-h-screen flex flex-col font-lato">
-      <WelcomeBanner />
+      <WelcomeBanner coupleNames={couple.names} coupleSlug={normalizedCoupleSlug} />
 
       <Header
-        coupleNames={coupleNames}
-        weddingDate={weddingDate}
-        isAdmin={isAuthenticated}      // ← sem !! desnecessário (já é boolean)
-        onLoginClick={() => setShowLoginModal(true)}
-        onLogoutClick={logout}
+        coupleNames={couple.names}
+        weddingDate={couple.weddingDateLabel}
+        weddingDateISO={couple.weddingDateISO}
       />
 
       <main className="flex-grow container mx-auto">
@@ -72,16 +71,16 @@ function HomePage() {
         )}
 
         <GiftList
-          gifts={gifts}
           isAdmin={isAuthenticated}
           onEditGift={handleEditGift}
           onDeleteGift={removeGift}
           onReserveGift={handleReserveGift}
-          coupleNames={coupleNames}
+          coupleNames={couple.names}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           filter={filter}
           onFilterChange={setFilter}
+          coupleSlug={normalizedCoupleSlug}
         />
       </main>
 
@@ -95,15 +94,16 @@ function HomePage() {
   )
 }
 
-// ─── App com roteamento ────────────────────────────────────
 export default function App() {
   return (
-    // ✅ AuthProvider envolve tudo — useAuth() funciona em qualquer filho
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/rsvp" element={<RSVP />} />
+          <Route path="/" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}`} replace />} />
+          <Route path="/rsvp" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}/rsvp`} replace />} />
+          <Route path="/:coupleSlug" element={<HomePage />} />
+          <Route path="/:coupleSlug/rsvp" element={<RSVP />} />
+          <Route path="*" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}`} replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

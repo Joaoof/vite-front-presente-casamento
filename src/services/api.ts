@@ -2,10 +2,16 @@ import { Gift } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+const withCoupleSlug = (path: string, coupleSlug?: string) => {
+  if (!coupleSlug) return `${API_URL}${path}`;
+
+  const separator = path.includes('?') ? '&' : '?';
+  return `${API_URL}${path}${separator}couple=${encodeURIComponent(coupleSlug)}`;
+};
 
 export const api = {
-  async getGifts(): Promise<Gift[]> {
-    const response = await fetch(`${API_URL}/gifts`, {
+  async getGifts(coupleSlug?: string): Promise<Gift[]> {
+    const response = await fetch(withCoupleSlug('/gifts', coupleSlug), {
       method: 'GET',
     });
 
@@ -13,9 +19,9 @@ export const api = {
     return response.json();
   },
 
-  async createGift(gift: Omit<Gift, 'id' | 'createdAt' | 'status'>): Promise<Gift> {
+  async createGift(gift: Omit<Gift, 'id' | 'createdAt' | 'status'>, coupleSlug?: string): Promise<Gift> {
     try {
-      const response = await fetch(`${API_URL}/gifts`, {
+      const response = await fetch(withCoupleSlug('/gifts', coupleSlug), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,8 +39,8 @@ export const api = {
   },
 
 
-  async reserveGift(giftId: string, guestName: string): Promise<Gift> {
-    const response = await fetch(`${API_URL}/gifts/${giftId}/reserve`, {
+  async reserveGift(giftId: string, guestName: string, coupleSlug?: string): Promise<Gift> {
+    const response = await fetch(withCoupleSlug(`/gifts/${giftId}/reserve`, coupleSlug), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,9 +56,9 @@ export const api = {
     return response.json();
   },
 
-  async updateGift(id: string, updates: Partial<Gift>): Promise<Gift> {
+  async updateGift(id: string, updates: Partial<Gift>, coupleSlug?: string): Promise<Gift> {
     try {
-      const response = await fetch(`${API_URL}/gifts/${id}`, {
+      const response = await fetch(withCoupleSlug(`/gifts/${id}`, coupleSlug), {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -69,9 +75,9 @@ export const api = {
     }
   },
 
-  async deleteGift(id: string) {
+  async deleteGift(id: string, coupleSlug?: string) {
     try {
-      const response = await fetch(`${API_URL}/gifts/${id}`, {
+      const response = await fetch(withCoupleSlug(`/gifts/${id}`, coupleSlug), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -105,7 +111,8 @@ export const api = {
     page: number = 1,
     limit: number = 12,
     filter: 'all' | 'available' | 'reserved' = 'all',
-    search: string = ''
+    search: string = '',
+    coupleSlug?: string,
   ): Promise<{ data: Gift[]; meta: any }> {
     const params = new URLSearchParams({
       page: String(page),
@@ -113,6 +120,8 @@ export const api = {
       filter,
       search,
     });
+
+    if (coupleSlug) params.append('couple', coupleSlug);
 
     const response = await fetch(`${API_URL}/gifts?${params.toString()}`);
     if (!response.ok) throw new Error('Falha ao buscar presentes');

@@ -14,6 +14,7 @@ interface GiftListProps {
   searchTerm: string;
   onFilterChange: (filter: 'all' | 'available' | 'reserved') => void;
   onSearchChange: (term: string) => void;
+  coupleSlug?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -28,6 +29,7 @@ const GiftList: React.FC<GiftListProps> = ({
   onFilterChange,
   searchTerm,
   onSearchChange,
+  coupleSlug,
 }) => {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +43,7 @@ const GiftList: React.FC<GiftListProps> = ({
     setIsLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/gifts`, {
+      const response = await fetch(`${API_URL}/gifts${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       });
@@ -61,7 +63,7 @@ const GiftList: React.FC<GiftListProps> = ({
     }
   };
 
-  useEffect(() => { fetchGifts(); }, [filter]);
+  useEffect(() => { fetchGifts(); }, [filter, coupleSlug]);
 
   const filteredGifts = useMemo(() => {
     return gifts

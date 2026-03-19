@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
-const WelcomeBanner: React.FC = () => {
+
+type WelcomeBannerProps = {
+    coupleNames?: string;
+    coupleSlug?: string;
+};
+
+const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
+    coupleNames = 'Luís & Natiele',
+    coupleSlug = 'luis-natiele',
+}) => {
     const [step, setStep] = useState<0 | 1 | 2 | 'done'>(0);
     const [isVisible, setIsVisible] = useState(false);
+    const welcomeSeenKey = `welcome_seen_${coupleSlug}`;
 
     useEffect(() => {
-        if (sessionStorage.getItem('welcome_seen')) {
+        if (sessionStorage.getItem(welcomeSeenKey)) {
             setStep('done');
             return;
         }
 
-        // Sequência de passos
         const timers = [
             setTimeout(() => setIsVisible(true), 500),
             setTimeout(() => { setIsVisible(false); setTimeout(() => { setStep(1); setIsVisible(true); }, 500); }, 3500),
@@ -17,13 +26,13 @@ const WelcomeBanner: React.FC = () => {
         ];
 
         return () => timers.forEach(clearTimeout);
-    }, []);
+    }, [welcomeSeenKey]);
 
     const handleClose = () => {
         setIsVisible(false);
         setTimeout(() => {
             setStep('done');
-            sessionStorage.setItem('welcome_seen', 'true');
+            sessionStorage.setItem(welcomeSeenKey, 'true');
         }, 500);
     };
 
@@ -43,10 +52,9 @@ const WelcomeBanner: React.FC = () => {
 
                 {step === 0 && (
                     <div className="space-y-6">
-                        {/* Imagem centralizada com mx-auto */}
                         <img src="https://cdn-icons-png.flaticon.com/512/5166/5166470.png" alt="" width={40} className="mx-auto" />
                         <div className="space-y-2">
-                            <span className="text-[10px] tracking-[0.4em] uppercase text-slate-500 font-medium">Luís & Natiele</span>
+                            <span className="text-[10px] tracking-[0.4em] uppercase text-slate-500 font-medium">{coupleNames}</span>
                             <h1 className="text-3xl font-light tracking-tight text-slate-100">Bem-vindos ao nosso <br /> pequeno espaço</h1>
                         </div>
                     </div>
@@ -63,7 +71,6 @@ const WelcomeBanner: React.FC = () => {
 
                 {step === 2 && (
                     <div className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md shadow-2xl">
-                        {/* Imagem centralizada com mx-auto e margem inferior (mb-6) para manter a proporção */}
                         <img src="https://images.icon-icons.com/3525/PNG/512/web_online_internet_global_earth_world_globe_icon_221254.png" alt="" width={100} className="mx-auto mb-6" />
                         <h2 className="text-xl font-semibold text-slate-100 mb-3">Site</h2>
                         <p className="text-slate-400 text-sm mb-8 leading-relaxed font-light">
@@ -75,9 +82,6 @@ const WelcomeBanner: React.FC = () => {
                         >
                             Veja nosso site
                         </button>
-                        <p className="mt-6 text-[9px] uppercase tracking-widest text-slate-600">
-                            Araguaína • 25 de Julho de 2026
-                        </p>
                     </div>
                 )}
             </div>

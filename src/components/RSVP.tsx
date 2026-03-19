@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { Heart, Send, ChevronDown, ChevronRight, Home, Sparkles, Loader2, ArrowLeft } from "lucide-react"
+import { getCoupleConfig, normalizeCoupleSlug } from "../config/couples"
 
 type FormData = {
   fullName: string
@@ -38,10 +39,18 @@ function SuccessScreen({
   name,
   attendance,
   onBack,
+  coupleHomePath,
+  coupleNames,
+  weddingDate,
+  cityLabel,
 }: {
   name: string
   attendance: "yes" | "no"
   onBack: () => void
+  coupleHomePath: string
+  coupleNames: string
+  weddingDate: string
+  cityLabel: string
 }) {
   const navigate = useNavigate()
 
@@ -68,9 +77,9 @@ function SuccessScreen({
               <span style={{ color: 'rgba(200,220,240,0.6)' }}>✦</span>
               confirmação recebida
               <span className="rounded-full border border-white/30 bg-white/10 px-3 py-0.5 font-bold tracking-widest">
-                Luís &amp; Natiele
+                {coupleNames}
               </span>
-              25 · 07 · 2026
+              {weddingDate}
               <span style={{ color: 'rgba(200,220,240,0.6)' }}>✦</span>
             </span>
           ))}
@@ -105,13 +114,13 @@ function SuccessScreen({
           </div>
 
           <p className="font-serif text-sm italic mb-8" style={{ color: '#7AAFD4' }}>
-            25 de Julho, 2026 · Araguaína, TO
+            {weddingDate} · {cityLabel}
           </p>
 
           {/* Botões de ação */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate(coupleHomePath)}
               className="inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
               style={{
                 background: 'linear-gradient(135deg, #1B3A6B, #4A7AB5)',
@@ -146,8 +155,8 @@ function SuccessScreen({
           <Heart className="w-4 h-4" style={{ color: 'rgba(74,122,181,0.35)', fill: 'rgba(74,122,181,0.35)' }} />
           <Sparkles className="w-4 h-4" style={{ color: 'rgba(74,122,181,0.35)' }} />
         </div>
-        <p className="font-serif text-base font-bold" style={{ color: '#1B3A6B' }}>Luís &amp; Natiele</p>
-        <p className="mt-1 text-xs" style={{ color: '#7AAFD4' }}>25 de Julho de 2026 · Araguaína, TO</p>
+        <p className="font-serif text-base font-bold" style={{ color: '#1B3A6B' }}>{coupleNames}</p>
+        <p className="mt-1 text-xs" style={{ color: '#7AAFD4' }}>{weddingDate} · {cityLabel}</p>
       </footer>
     </div>
   )
@@ -163,6 +172,15 @@ export default function RSVP() {
     } catch { return EMPTY_FORM }
   })
   const [status, setStatus] = useState<Status>("idle")
+
+  const { coupleSlug } = useParams<{ coupleSlug: string }>()
+  const normalizedCoupleSlug = normalizeCoupleSlug(coupleSlug)
+  const couple = getCoupleConfig(normalizedCoupleSlug)
+  const coupleHomePath = `/${normalizedCoupleSlug}`
+  const coupleNames = couple.names
+  const weddingDate = couple.weddingDateLabel
+  const cityLabel = couple.cityLabel
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" })
@@ -184,7 +202,7 @@ export default function RSVP() {
     e.preventDefault()
     setStatus("loading")
     try {
-      await fetch("/api/rsvp", {
+      await fetch(`/api/rsvp?couple=${encodeURIComponent(normalizedCoupleSlug)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -209,6 +227,10 @@ export default function RSVP() {
         name={form.fullName}
         attendance={form.attendance}
         onBack={handleBackToForm}
+        coupleHomePath={coupleHomePath}
+        coupleNames={couple.names}
+        weddingDate={couple.weddingDateLabel}
+        cityLabel={couple.cityLabel}
       />
     )
   }
@@ -232,9 +254,9 @@ export default function RSVP() {
               <span style={{ color: 'rgba(200,220,240,0.6)' }}>✦</span>
               confirme sua presença
               <span className="rounded-full border border-white/30 bg-white/10 px-3 py-0.5 font-bold tracking-widest">
-                Luís &amp; Natiele
+                {coupleNames}
               </span>
-              25 · 07 · 2026
+              {weddingDate}
               <span style={{ color: 'rgba(200,220,240,0.6)' }}>✦</span>
             </span>
           ))}
@@ -246,7 +268,7 @@ export default function RSVP() {
 
           {/* Botão voltar */}
           <Link
-            to="/"
+            to={coupleHomePath}
             className="mb-6 inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[#1B3A6B] w-fit"
             style={{ color: '#4A7AB5' }}
           >
@@ -271,7 +293,7 @@ export default function RSVP() {
             <div className="relative p-8">
               <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.4em]"
                 style={{ color: 'rgba(200,220,240,0.6)' }}>
-                25 · 07 · 2026 · Araguaína, TO
+                {weddingDate} · {cityLabel}
               </p>
               <h1 className="font-serif text-4xl font-bold text-white drop-shadow-lg md:text-5xl">
                 Confirme sua Presença
@@ -292,7 +314,7 @@ export default function RSVP() {
                 <Heart className="h-3.5 w-3.5" style={{ color: '#4A7AB5', fill: '#4A7AB5' }} />
                 <div className="h-[1px] w-8" style={{ background: '#C8DCF0' }} />
               </div>
-              <p className="font-serif text-xl font-bold" style={{ color: '#1B3A6B' }}>Luís &amp; Natiele</p>
+              <p className="font-serif text-xl font-bold" style={{ color: '#1B3A6B' }}>{coupleNames}</p>
               <p className="text-sm mt-1" style={{ color: '#7AAFD4' }}>Preencha o formulário abaixo</p>
             </div>
 
@@ -414,8 +436,8 @@ export default function RSVP() {
               <Heart className="w-4 h-4" style={{ color: 'rgba(74,122,181,0.35)', fill: 'rgba(74,122,181,0.35)' }} />
               <Sparkles className="w-4 h-4" style={{ color: 'rgba(74,122,181,0.35)' }} />
             </div>
-            <p className="font-serif text-lg font-bold" style={{ color: '#1B3A6B' }}>Luís &amp; Natiele</p>
-            <p className="mt-1 text-sm" style={{ color: '#7AAFD4' }}>25 de Julho de 2026 · Araguaína, TO</p>
+            <p className="font-serif text-lg font-bold" style={{ color: '#1B3A6B' }}>{coupleNames}</p>
+            <p className="mt-1 text-sm" style={{ color: '#7AAFD4' }}>{weddingDate} · {cityLabel}</p>
           </footer>
 
         </div>

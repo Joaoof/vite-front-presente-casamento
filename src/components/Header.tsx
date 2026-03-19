@@ -2,7 +2,11 @@ import { Heart, Menu, X, Clock, MapPin, GlassWater, Music, LogIn, CheckCircle, S
 import { useEffect, useState } from "react";
 import LoginModal from "./LoginModal";
 
-const targetDate = new Date("2026-07-25T18:00:00").getTime();
+type HeaderProps = {
+  coupleNames?: string;
+  weddingDate?: string;
+  weddingDateISO?: string;
+};
 
 type TimeLeft = {
   dias: number;
@@ -11,7 +15,11 @@ type TimeLeft = {
   segundos: number;
 };
 
-export default function Header() {
+export default function Header({
+  coupleNames = "Luís & Natiele",
+  weddingDate = "25 de Julho de 2026",
+  weddingDateISO = "2026-07-25T18:00:00",
+}: HeaderProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -33,6 +41,7 @@ export default function Header() {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date().getTime();
+      const targetDate = new Date(weddingDateISO).getTime();
       const difference = targetDate - now;
       if (difference > 0) {
         setTimeLeft({
@@ -44,7 +53,7 @@ export default function Header() {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [weddingDateISO]);
 
   useEffect(() => {
     const anyOpen = isScheduleModalOpen || isAccessModalOpen || isLoginModalOpen;
@@ -256,8 +265,8 @@ export default function Header() {
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-white/30">
                 <Heart className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-xl font-serif text-white mb-1">Luís & Natiele</h3>
-              <p className="text-white/70 text-xs tracking-widest uppercase">25 de Julho de 2026</p>
+              <h3 className="text-xl font-serif text-white mb-1">{coupleNames}</h3>
+              <p className="text-white/70 text-xs tracking-widest uppercase">{weddingDate}</p>
             </div>
             <div className="h-4 bg-white relative -mt-4 rounded-t-[2rem]" />
             <div className="px-6 pb-8 -mt-1 flex flex-col gap-4">
@@ -292,7 +301,7 @@ export default function Header() {
                 </div>
                 <div className="text-left">
                   <p className="font-semibold text-[#1B3A6B] text-sm">Área do Casal</p>
-                  <p className="text-slate-400 text-xs mt-0.5">Acesso exclusivo para Luís & Natiele</p>
+                  <p className="text-slate-400 text-xs mt-0.5">Acesso exclusivo para {coupleNames}</p>
                 </div>
               </button>
             </div>
@@ -363,10 +372,10 @@ export default function Header() {
             <div className="w-full flex flex-col items-center justify-center text-center text-white px-6 py-16">
               <span className="text-xs tracking-[0.3em] uppercase text-blue-200 mb-4 drop-shadow-md">Reserve a data</span>
               <h1 className="text-3xl md:text-6xl font-serif mb-6 drop-shadow-lg text-white">
-                Luís <span className="text-blue-300">e</span> Natiele
+                {coupleNames}
               </h1>
               <p className="text-xs md:text-xl text-white mb-8 drop-shadow-lg font-medium tracking-wide">
-                25 de Julho de 2026
+                {weddingDate}
               </p>
               <button
                 onClick={() => setIsScheduleModalOpen(true)}

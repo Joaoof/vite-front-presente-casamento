@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Gift } from '../types';
 import { api } from '../services/api';
 
-export const useGifts = () => {
+export const useGifts = (coupleSlug?: string) => {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,7 +10,7 @@ export const useGifts = () => {
 
   const fetchGifts = async () => {
     try {
-      const data = await api.getGifts();
+      const data = await api.getGifts(coupleSlug);
       setGifts(data);
     } catch (error) {
       console.error('Error fetching gifts:', error);
@@ -21,11 +21,11 @@ export const useGifts = () => {
 
   useEffect(() => {
     fetchGifts();
-  }, []);
+  }, [coupleSlug]);
 
   const addGift = async (gift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,9 +33,6 @@ export const useGifts = () => {
         },
         body: JSON.stringify(gift),
       });
-
-      console.log(response);
-
 
       if (!response.ok) throw new Error('Failed to add gift');
 
@@ -49,7 +46,7 @@ export const useGifts = () => {
 
   const updateGift = async (id: string, updates: Partial<Gift>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +67,7 @@ export const useGifts = () => {
 
   const removeGift = async (id: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
         method: 'DELETE',
 
         headers: {
@@ -78,8 +75,6 @@ export const useGifts = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(response);
-
 
       if (!response.ok) throw new Error('Failed to delete gift');
 
@@ -92,7 +87,7 @@ export const useGifts = () => {
 
   const reserveGift = async (id: string, reservedBy: string) => {
     try {
-      const updatedGift = await api.reserveGift(id, reservedBy);
+      const updatedGift = await api.reserveGift(id, reservedBy, coupleSlug);
       setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
       return updatedGift;
     } catch (error) {
