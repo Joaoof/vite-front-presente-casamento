@@ -279,7 +279,7 @@ export default function RSVP() {
           {/* HERO BANNER */}
           <div className="mb-8 min-h-[300px] overflow-hidden rounded-2xl flex flex-col justify-end relative"
             style={{ boxShadow: '0 8px 40px rgba(27,58,107,0.18)' }}>
-            <img src="/img9.JPG" alt="Luís e Natiele"
+            <img src="/img9.webp" alt="Luís e Natiele"
               className="absolute inset-0 w-full h-full object-cover object-top" />
             <div className="absolute inset-0"
               style={{ background: 'linear-gradient(to top, rgba(27,48,96,0.92) 0%, rgba(27,48,96,0.2) 60%)' }} />

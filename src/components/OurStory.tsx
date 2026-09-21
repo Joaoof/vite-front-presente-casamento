@@ -492,7 +492,7 @@ export default function OurStory() {
       {/* HERO */}
       <StickyReveal index={0}>
         <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 scale-105 bg-cover bg-center" style={{ backgroundImage: 'url("img2.JPG")' }} />
+          <div className="absolute inset-0 scale-105 bg-cover bg-center" style={{ backgroundImage: 'url("/img2.webp")' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#1B3A6B]/10 via-[#1B3A6B]/40 to-[#1B3A6B]/75" />
           <div className="relative z-10 flex flex-col items-center px-6 text-center">
             <div className="mb-5 flex items-center gap-3 opacity-70">
@@ -632,7 +632,7 @@ export default function OurStory() {
         <section className="relative flex h-screen w-full overflow-hidden dark:bg-slate-900">
           <div className="flex w-full flex-col md:flex-row">
             <div className="relative h-[40vh] w-full md:h-full md:w-1/2">
-              <img src="img9.JPG" alt="Luís e Natiele" className="h-full w-full object-cover object-top" />
+              <img src="/img9.webp" alt="Luís e Natiele" className="h-full w-full object-cover object-top" />
               <div className="absolute inset-0 hidden md:block"
                 style={{ background: 'linear-gradient(to right, transparent 55%, #1B3060 100%)' }} />
               <div className="absolute inset-0 md:hidden"

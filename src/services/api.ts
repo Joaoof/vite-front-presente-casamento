@@ -1,6 +1,32 @@
 import { Gift } from '../types';
+import { DEMO_GIFTS } from '../data/demoGifts';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+/*  Sem VITE_API_URL configurada o front roda em modo demonstração:  */
+/*  presentes e login vivem no localStorage, sem backend.             */
+const DEMO_MODE = !import.meta.env.VITE_API_URL;
+const DEMO_TOKEN = 'demo-token';
+const DEMO_USER = 'demo';
+const DEMO_PASSWORD = 'demo';
+
+const demoKey = (coupleSlug?: string) => `demo_gifts_${coupleSlug ?? 'default'}`;
+
+const readDemoGifts = (coupleSlug?: string): Gift[] => {
+  try {
+    const saved = localStorage.getItem(demoKey(coupleSlug));
+    if (saved) return JSON.parse(saved);
+  }
+  catch {
+    /*  Cache inválido: volta para a lista padrão.  */
+  }
+  return DEMO_GIFTS.map((gift) => ({ ...gift }));
+};
+
+const writeDemoGifts = (gifts: Gift[], coupleSlug?: string): Gift[] => {
+  localStorage.setItem(demoKey(coupleSlug), JSON.stringify(gifts));
+  return gifts;
+};
 
 const withCoupleSlug = (path: string, coupleSlug?: string) => {
   if (!coupleSlug) return `${API_URL}${path}`;
@@ -11,6 +37,8 @@ const withCoupleSlug = (path: string, coupleSlug?: string) => {
 
 export const api = {
   async getGifts(coupleSlug?: string): Promise<Gift[]> {
+    if (DEMO_MODE) return readDemoGifts(coupleSlug);
+
     const response = await fetch(withCoupleSlug('/gifts', coupleSlug), {
       method: 'GET',
     });
@@ -20,6 +48,12 @@ export const api = {
   },
 
   async createGift(gift: Omit<Gift, 'id' | 'createdAt' | 'status'>, coupleSlug?: string): Promise<Gift> {
+    if (DEMO_MODE) {
+      const newGift: Gift = { ...gift, id: `demo-${Date.now()}`, createdAt: Date.now(), status: 'available' };
+      writeDemoGifts([...readDemoGifts(coupleSlug), newGift], coupleSlug);
+      return newGift;
+    }
+
     try {
       const response = await fetch(withCoupleSlug('/gifts', coupleSlug), {
         method: 'POST',
@@ -40,6 +74,17 @@ export const api = {
 
 
   async reserveGift(giftId: string, guestName: string, coupleSlug?: string): Promise<Gift> {
+    if (DEMO_MODE) {
+      const gifts = readDemoGifts(coupleSlug);
+      const gift = gifts.find((item) => item.id === giftId);
+      if (!gift) throw new Error('Presente não encontrado');
+      if (gift.status === 'reserved') throw new Error('Presente já reservado');
+
+      const updated: Gift = { ...gift, status: 'reserved', reservedBy: guestName };
+      writeDemoGifts(gifts.map((item) => item.id === giftId ? updated : item), coupleSlug);
+      return updated;
+    }
+
     const response = await fetch(withCoupleSlug(`/gifts/${giftId}/reserve`, coupleSlug), {
       method: 'POST',
       headers: {
@@ -57,6 +102,16 @@ export const api = {
   },
 
   async updateGift(id: string, updates: Partial<Gift>, coupleSlug?: string): Promise<Gift> {
+    if (DEMO_MODE) {
+      const gifts = readDemoGifts(coupleSlug);
+      const gift = gifts.find((item) => item.id === id);
+      if (!gift) throw new Error('Presente não encontrado');
+
+      const updated: Gift = { ...gift, ...updates, id };
+      writeDemoGifts(gifts.map((item) => item.id === id ? updated : item), coupleSlug);
+      return updated;
+    }
+
     try {
       const response = await fetch(withCoupleSlug(`/gifts/${id}`, coupleSlug), {
         method: 'PATCH',
@@ -76,6 +131,11 @@ export const api = {
   },
 
   async deleteGift(id: string, coupleSlug?: string) {
+    if (DEMO_MODE) {
+      writeDemoGifts(readDemoGifts(coupleSlug).filter((item) => item.id !== id), coupleSlug);
+      return;
+    }
+
     try {
       const response = await fetch(withCoupleSlug(`/gifts/${id}`, coupleSlug), {
         method: 'DELETE',
@@ -92,6 +152,11 @@ export const api = {
   },
 
   async login(username: string, password: string): Promise<{ accessToken: string }> {
+    if (DEMO_MODE) {
+      if (username === DEMO_USER && password === DEMO_PASSWORD) return { accessToken: DEMO_TOKEN };
+      throw new Error('Credenciais inválidas');
+    }
+
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',

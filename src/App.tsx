@@ -13,6 +13,7 @@ import LoginModal from './components/LoginModal'
 import PhotoCarousel from './components/PhotosCarousel'
 import OurStory from './components/OurStory'
 import RSVP from './components/RSVP'
+import Partnership from './components/Partnership'
 
 import './styles/animations.css'
 import WelcomeBanner from './components/WelcomeBanner'
@@ -101,6 +102,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}`} replace />} />
           <Route path="/rsvp" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}/rsvp`} replace />} />
+          <Route path="/parceria" element={<Partnership />} />
           <Route path="/:coupleSlug" element={<HomePage />} />
           <Route path="/:coupleSlug/rsvp" element={<RSVP />} />
           <Route path="*" element={<Navigate to={`/${DEFAULT_COUPLE_SLUG}`} replace />} />

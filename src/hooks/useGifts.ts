@@ -25,18 +25,7 @@ export const useGifts = (coupleSlug?: string) => {
 
   const addGift = async (gift: Omit<Gift, 'id' | 'createdAt' | 'status'>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify(gift),
-      });
-
-      if (!response.ok) throw new Error('Failed to add gift');
-
-      const newGift = await response.json();
+      const newGift = await api.createGift(gift, coupleSlug);
       setGifts(prev => [...prev, newGift]);
     } catch (error) {
       console.error('Error adding gift:', error);
@@ -46,18 +35,7 @@ export const useGifts = (coupleSlug?: string) => {
 
   const updateGift = async (id: string, updates: Partial<Gift>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) throw new Error('Failed to update gift');
-
-      const updatedGift = await response.json();
+      const updatedGift = await api.updateGift(id, updates, coupleSlug);
       setGifts(prev => prev.map(gift => gift.id === id ? updatedGift : gift));
     } catch (error) {
       console.error('Error updating gift:', error);
@@ -67,16 +45,7 @@ export const useGifts = (coupleSlug?: string) => {
 
   const removeGift = async (id: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/gifts/${id}${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
-        method: 'DELETE',
-
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) throw new Error('Failed to delete gift');
+      await api.deleteGift(id, coupleSlug);
 
       setGifts(prev => prev.filter(gift => gift.id !== id));
     } catch (error) {

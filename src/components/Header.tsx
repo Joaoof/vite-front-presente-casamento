@@ -314,7 +314,7 @@ export default function Header({
       {/* CONTAINER HERO */}
       <div className="w-full flex flex-col min-h-screen relative">
         <div className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5)), url("/img1.JPG")' }} />
+          style={{ backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5)), url("/img1.webp")' }} />
 
         {/* NAVBAR */}
         <header className="relative md:sticky md:top-0 z-50 w-full bg-transparent">

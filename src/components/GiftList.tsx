@@ -3,6 +3,7 @@ import { Gift } from '../types';
 import GiftItem from './GiftItem';
 import { ChevronLeft, ChevronRight, PresentationIcon, Search } from 'lucide-react';
 import ReservationModal from './ReservationModal';
+import { api } from '../services/api';
 
 interface GiftListProps {
   isAdmin: boolean;
@@ -42,16 +43,7 @@ const GiftList: React.FC<GiftListProps> = ({
   const fetchGifts = async () => {
     setIsLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/gifts${coupleSlug ? `?couple=${encodeURIComponent(coupleSlug)}` : ''}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      });
-      if (!response.ok) {
-        if (!hasError) { alert('Erro ao carregar lista de presentes.'); setHasError(true); }
-        return;
-      }
-      const result = await response.json();
+      const result = await api.getGifts(coupleSlug);
       setGifts(Array.isArray(result) ? result : []);
       setHasError(false);
       setCurrentPage(1);
