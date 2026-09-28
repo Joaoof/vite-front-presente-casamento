@@ -51,20 +51,20 @@ export const PLANS: PartnerPlan[] = [
   {
     id:     "simples",
     name:   "Site simples",
-    price:  197,
+    price:  97,
     detail: "História do casal, fotos, confirmação de presença e lista de presentes.",
   },
   {
     id:          "completo",
     name:        "Site completo",
-    price:       347,
-    detail:      "Tudo do simples, mais cronograma do dia, stories com música, painel do casal e instalação no celular.",
+    price:       147,
+    detail:      "Tudo do simples, mais cronograma do dia, stories com música, painel do casal, avisos no WhatsApp e instalação no celular.",
     highlighted: true,
   },
   {
     id:     "proprio",
     name:   "Completo com domínio próprio",
-    price:  597,
+    price:  247,
     detail: "Tudo do completo, com endereço próprio (ex.: marinaerafael.com.br) e convite digital animado.",
   },
 ]
@@ -115,6 +115,10 @@ export const OBJECTIONS: Objection[] = [
   {
     question: "Eu já indico o iCasei há anos e nunca tive problemas. O que o seu sistema tem que justificaria eu arriscar minha reputação com as minhas noivas?",
     answer:   "Não estou pedindo para você trocar nada. Estou pedindo um piloto com um casal, escolhido por você, sem custo para o casal e com devolução integral se algo falhar. O que muda: o site é feito para aquele casal, sem template e sem logo de terceiros; o casal paga uma vez e não tem taxa sobre os presentes; você recebe as confirmações organizadas; e uma parte de cada site é sua.",
+  },
+  {
+    question: "Tem gente vendendo site de casamento por R$ 50. Por que o seu custa mais?",
+    answer:   "Por R$ 50 a noiva recebe um modelo pronto e preenche tudo sozinha: fotos, textos, lista. Aqui eu faço isso por ela, o site é feito para aquele casal, os convidados e os noivos recebem os avisos no WhatsApp, e eu fico de plantão no fim de semana do casamento. A diferença de preço é menor que um arranjo de mesa, e uma parte dela é sua.",
   },
   {
     question: "E se o site cair no sábado à noite, no meio da festa?",
